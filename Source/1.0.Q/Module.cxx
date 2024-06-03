@@ -25,7 +25,7 @@ SOFTWARE.
 #define MAX_MODULE_NAME_PATH_LENGTH 128
 
 // 0x100010d0
-BOOL WINAPI Main(HINSTANCE instance, DWORD reason, LPVOID reserved)
+BOOL WINAPI Main(HINSTANCE instance, DWORD reason, LPVOID)
 {
     if (reason != DLL_PROCESS_ATTACH) { return TRUE; }
 
