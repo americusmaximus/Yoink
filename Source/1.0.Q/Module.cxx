@@ -20,12 +20,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "Cursor.hxx"
 #include "Module.hxx"
 
 #define MAX_MODULE_NAME_PATH_LENGTH 128
 
 // 0x100010d0
-BOOL WINAPI Main(HINSTANCE instance, DWORD reason, LPVOID)
+BOOL WINAPI Main(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {
     if (reason != DLL_PROCESS_ATTACH) { return TRUE; }
 
@@ -163,9 +164,26 @@ s32 RADEXPLINK BinkBufferUnlock(HBINKBUFFER buf)
 // 0x10005cb0
 s32 RADEXPLINK BinkCheckCursor(HWND wnd, s32 x, s32 y, s32 w, s32 h)
 {
-    // TODO NOT IMPLEMENTED
+    if (CursorState.Width == 0) {
+        CursorState.Width = GetSystemMetrics(SM_CXCURSOR);
+        CursorState.Height = GetSystemMetrics(SM_CYCURSOR);
+    }
 
-    return 0;
+    POINT window = { x, y };
+    if (wnd != NULL) { ClientToScreen(wnd, &window); }
+
+    POINT cursor;
+    GetCursorPos(&cursor);
+
+    s32 result = 0;
+    if (window.x < (CursorState.Width + cursor.x) && cursor.x < (window.x + w)
+        && window.y < (CursorState.Height + cursor.y) && cursor.y < (window.y + h)) {
+        do {
+            result = result + 1;
+        } while (-1 < ShowCursor(FALSE));
+    }
+
+    return result;
 }
 
 // 0x1000a2e0
@@ -351,8 +369,7 @@ s32 RADEXPLINK BinkPause(HBINK bnk, s32 pause)
 // 0x10005d60
 void RADEXPLINK BinkRestoreCursor(s32 checkcount)
 {
-    if (checkcount != 0)
-    {
+    if (checkcount != 0) {
         do
         {
             ShowCursor(TRUE);
