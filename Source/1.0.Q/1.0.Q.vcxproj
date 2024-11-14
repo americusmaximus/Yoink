@@ -24,12 +24,14 @@
   <ItemGroup>
     <ClInclude Include="Base.hxx" />
     <ClInclude Include="Bink.h" />
+    <ClInclude Include="Cursor.hxx" />
     <ClInclude Include="Module.hxx" />
     <ClInclude Include="Rad.h" />
     <ClInclude Include="Resource.hxx" />
     <ClInclude Include="State.hxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cursor.cxx" />
     <ClCompile Include="Module.cxx" />
     <ClCompile Include="State.cxx" />
   </ItemGroup>
