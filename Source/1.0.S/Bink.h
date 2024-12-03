@@ -3,7 +3,6 @@ Copyright (c) 1994-2000, RAD Game Tools, Inc.
 Copyright (c) 2024 Americus Maximus
 */
 
-
 #ifndef BINKH
 #define BINKH
 
