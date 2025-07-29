@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,9 @@ SOFTWARE.
 
 #pragma once
 
-#include "Base.hxx"
+#include "Yoink.hxx"
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+extern BOOL             IsTimerInitializationRequired;  // 0x1003e920
 
-EXTERN STATE State;
+extern LARGE_INTEGER    TimerFrequency;                 // 0x1004f1e0
+extern LARGE_INTEGER    TimerCounter;                   // 0x1004f1d8

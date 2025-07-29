@@ -20,13 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
+#include "State.hxx"
 
-#include "Yoink.hxx"
+s32         FrameRate = DEFAULT_FRAME_RATE;
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+s32         Simulate = DEFAULT_SIMULATE;
 
-EXTERN STATE State;
+s32         Height;
+s32         Width;
+
+s32         FrameRateDiv;
+char        BinkError[MAX_BINK_ERROR_LENGTH];
+
+HANDLE   Instance;

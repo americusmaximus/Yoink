@@ -22,11 +22,20 @@ SOFTWARE.
 
 #pragma once
 
-#include "Yoink.hxx"
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+#include <windows.h>
 
-EXTERN STATE State;
+#define EXTERN extern
+
+#define __RADINDLL__
+#include "Bink.h"
+
+#define BINKSURFACENONE     (-1)
+
+#define DEFAULT_FRAME_RATE  (-1)
+#define DEFAULT_SOUND_TRACK (-1)
+
+#define MODULE_HANDLE_NOT_LOADED    ((HMODULE)1)
+#define MAX_INVALID_MODULE_HANDLE   ((HMODULE)32)

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 - 2025 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,4 @@ SOFTWARE.
 
 #include "Yoink.hxx"
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
-
-EXTERN STATE State;
+void RADEXPLINK FUN_10008bb0(struct BINK PTR4* bink); // TODO

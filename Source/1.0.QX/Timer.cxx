@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
+#include "Timer.hxx"
 
-#include "Base.hxx"
+BOOL                IsTimerInitializationRequired = TRUE;
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x300532ac
-} STATE, * STATEPTR;
-
-EXTERN STATE State;
+LARGE_INTEGER       TimerFrequency;
+LARGE_INTEGER       TimerCounter;

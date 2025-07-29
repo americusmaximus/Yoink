@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2024 - 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,23 @@ SOFTWARE.
 
 #pragma once
 
-#include "Base.hxx"
+#include "Yoink.hxx"
 
-typedef struct CursorState
-{
-    s32 Width;      // 0x10041678
-    s32 Height;     // 0x10041630
-} CURSORSTATE, * CURSORSTATEPTR;
+#define MAX_BINK_ERROR_LENGTH   256
+#define MAX_BINK_VIDEO_SIZE     14848
 
-EXTERN CURSORSTATE CursorState;
+#define DEFAULT_SIMULATE        (-1)
+
+extern s32      FrameRate;                          // 0x1003a070
+
+extern s32      Simulate;                           // 0x1003a078
+
+extern u8       BinkVideo[MAX_BINK_VIDEO_SIZE];     // 0x1003a080
+
+extern s32      Height;                             // 0x10041524
+extern s32      Width;                              // 0x10041528
+
+extern s32      FrameRateDiv;                       // 0x10041a7c
+extern char     BinkError[MAX_BINK_ERROR_LENGTH];   // 0x10041a80
+
+extern HANDLE   Instance;                           // 0x1004f3e8

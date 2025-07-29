@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 - 2025 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,21 @@ SOFTWARE.
 
 #include "Yoink.hxx"
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+#define THREAD_CONTROL_NONE         0
+#define THREAD_CONTROL_ACTIVE       1
+#define THREAD_CONTROL_COMPLETED    2
 
-EXTERN STATE State;
+typedef void(RADEXPLINK* THREADACTION)(struct BINK PTR4* bink, void* value);
+
+typedef struct BINKTHREAD
+{
+    THREADACTION    Action;
+    HBINK           Bink;
+    void*           Value;
+    HANDLE          Handle;
+    DWORD           ID;
+} BINKTHREAD, * BINKTHREADPTR;
+
+BINKTHREADPTR RADEXPLINK CreateBinkThread(THREADACTION action, struct BINK PTR4* bink, void* value);
+DWORD WINAPI BinkThreadStartAction(LPVOID lpThreadParameter);
+void RADEXPLINK BinkThreadAction(struct BINK PTR4* bink, void* value);

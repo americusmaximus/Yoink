@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 - 2025 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,16 @@ SOFTWARE.
 
 #include "Yoink.hxx"
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+#define CURSOR_TYPE_WINDOW_NAME     "MouseTypeWind"
+#define CURSOR_TYPE_WINDOW_SIZE     32
 
-EXTERN STATE State;
+extern s32      CursorIsSoftware;   // 0x10041420
+
+extern s32      CursorHeight;       // 0x10041630
+
+extern HCURSOR  CursorPointer;      // 0x1004166c
+extern void*    CursorSurface;      // 0x10041670
+extern u32      CursorBits;         // 0x10041674
+extern s32      CursorWidth;        // 0x10041678
+
+LRESULT WINAPI BinkCursorWindowProc(HWND wnd, UINT msg, WPARAM wp, LPARAM lp);

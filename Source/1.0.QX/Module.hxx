@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2024 - 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ SOFTWARE.
 #include "State.hxx"
 
 RADEXPFUNC void RADEXPLINK ExpandBink(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13, u32 param_14); // TODO
-RADEXPFUNC void RADEXPLINK ExpandBundleSizes(u32 param_1, u32 param_2); // TODO
+RADEXPFUNC void RADEXPLINK ExpandBundleSizes(struct BUNDLEPOINTERS* pointers, u32 width);
 RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
 RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
 RADEXPFUNC void RADEXPLINK YUV_blit_16a4bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO

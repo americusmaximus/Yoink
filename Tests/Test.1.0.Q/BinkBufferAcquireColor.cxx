@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
+#include "BinkBufferAcquireColor.hxx"
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
+#include <Buffer.hxx>
 
-#include <windows.h>
+#define BINK_BUFFER_ACQUIRE_COLOR_ADDRESS(X)    ((size_t)X + (0x100058d0 - BINK_BASE_ADDRESS))
 
-#define EXTERN extern
+typedef u32(*BINKBUFFERACQUIRECOLORACTION)(u32 value, u32 mask);
 
-#define __RADINDLL__
-#include "Bink.h"
-#include "Rad.h"
+u32 Execute(u32 value, u32 mask, BINKBUFFERACQUIRECOLORACTION bnk, BINKBUFFERACQUIRECOLORACTION imp) {
+    return bnk(value, mask) == imp(value, mask);
+}
+
+#define TEST(V, M) if (!Execute(V, M, action, BinkBufferAcquireColor)) { strcpy(message, #V":"#M); return FALSE; }
+
+int ExecuteBinkBufferAcquireColor(HMODULE bink, char* message) {
+    BINKBUFFERACQUIRECOLORACTION action =
+        (BINKBUFFERACQUIRECOLORACTION)BINK_BUFFER_ACQUIRE_COLOR_ADDRESS(bink);
+
+    TEST(1, 0xFF000000);
+    TEST(1, 0x00FF0000);
+    TEST(1, 0x0000FF00);
+    TEST(1, 0x000000FF);
+    TEST(1, 0x0000F800);
+    TEST(1, 0x00007C00);
+    TEST(1, 0x000003E0);
+    TEST(1, 0x000000F0);
+    TEST(1, 0x0000001F);
+    TEST(1, 0x0000000F);
+
+    return TRUE;
+}

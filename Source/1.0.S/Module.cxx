@@ -25,14 +25,14 @@ SOFTWARE.
 #define MAX_MODULE_NAME_PATH_LENGTH 128
 
 // 0x100010d0
-BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID)
+BOOL WINAPI Main(HINSTANCE instance, DWORD reason, LPVOID)
 {
     if (reason != DLL_PROCESS_ATTACH) { return TRUE; }
 
     State.Instance = instance;
 
     char name[MAX_MODULE_NAME_PATH_LENGTH];
-    GetModuleFileNameA(instance, name, MAX_MODULE_NAME_PATH_LENGTH - 1);
+    GetModuleFileNameA(instance, name, MAX_MODULE_NAME_PATH_LENGTH);
 
     const u32 length = radstrlen(name);
 
@@ -44,11 +44,11 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID)
     }
 
     char directory[MAX_MODULE_NAME_PATH_LENGTH];
-    GetWindowsDirectoryA(directory, MAX_MODULE_NAME_PATH_LENGTH - 1);
+    GetWindowsDirectoryA(directory, MAX_MODULE_NAME_PATH_LENGTH);
 
     if (radstricmp(name, directory) != 0)
     {
-        GetSystemDirectoryA(directory, MAX_MODULE_NAME_PATH_LENGTH - 1);
+        GetSystemDirectoryA(directory, MAX_MODULE_NAME_PATH_LENGTH);
 
         if (radstricmp(name, directory) != 0) { return TRUE; }
     }

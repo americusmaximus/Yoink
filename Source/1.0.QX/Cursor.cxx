@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
+#include "Cursor.hxx"
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
+s32         CursorIsSoftware;
 
-#include <windows.h>
+s32         CursorHeight;
 
-#define EXTERN extern
+HCURSOR     CursorPointer;
+void*       CursorSurface;
+u32         CursorBits;
+s32         CursorWidth;
 
-#define __RADINDLL__
-#include "Bink.h"
+// 0x10005900
+LRESULT WINAPI BinkCursorWindowProc(HWND wnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    switch (msg)
+    {
+    case WM_DESTROY: { return 0; }
+    case WM_PAINT: {
+        PAINTSTRUCT paint;
+
+        BeginPaint(wnd, &paint);
+        EndPaint(wnd, &paint);
+
+        return 0;
+    }
+    case WM_ERASEBKGND: { return 1; }
+    }
+
+    return DefWindowProcA(wnd, msg, wp & 0xFFFF, lp);
+}

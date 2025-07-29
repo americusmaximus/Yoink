@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 - 2025 Americus Maximus
+Copyright (c) 2025 Americus Maximus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,9 @@ SOFTWARE.
 
 #pragma once
 
-#include "Yoink.hxx"
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 
-typedef struct State
-{
-    HANDLE Instance;        // 0x1004f3e8
-} STATE, * STATEPTR;
+#include <windows.h>
 
-EXTERN STATE State;
+#define BINK_BASE_ADDRESS   0x10000000
