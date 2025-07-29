@@ -78,8 +78,11 @@ int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
     result &= a->ddoffscreen == b->ddoffscreen;                     // 0
     result &= a->lastovershow == b->lastovershow;                   // 0
 
-    // TODO
-    //result &= a->issoftcur == b->issoftcur;                         // 0
+    // Note:
+    // Soft cursor is being detected...
+    
+    //result &= a->issoftcur == b->issoftcur;                       // 0
+
     result &= a->cursorcount == b->cursorcount;                     // 0
     result &= a->buffertop == b->buffertop;                         // NULL
     result &= a->type == b->type;                                   // 0

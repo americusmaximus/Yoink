@@ -195,6 +195,7 @@
     <ClCompile Include="BinkBufferClear.cxx" />
     <ClCompile Include="BinkBufferDirectDrawCapabilitiesInitialize.cxx" />
     <ClCompile Include="BinkBufferOpen.cxx" />
+    <ClCompile Include="BinkIsSoftwareCursor.cxx" />
     <ClCompile Include="Main.cxx" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +209,7 @@
     <ClInclude Include="BinkBufferClear.hxx" />
     <ClInclude Include="BinkBufferDirectDrawCapabilitiesInitialize.hxx" />
     <ClInclude Include="BinkBufferOpen.hxx" />
+    <ClInclude Include="BinkIsSoftwareCursor.hxx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

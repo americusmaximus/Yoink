@@ -24,6 +24,7 @@ SOFTWARE.
 #include "BinkBufferClear.hxx"
 #include "BinkBufferDirectDrawCapabilitiesInitialize.hxx"
 #include "BinkBufferOpen.hxx"
+#include "BinkIsSoftwareCursor.hxx"
 
 #include <stdio.h>
 
@@ -56,6 +57,8 @@ int main(int argc, char** argv) {
     EXECUTE(BinkBufferClear);
     EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
     EXECUTE(BinkBufferOpen);
+
+    EXECUTE(BinkIsSoftwareCursor);
 
     FreeLibrary(bink);
 

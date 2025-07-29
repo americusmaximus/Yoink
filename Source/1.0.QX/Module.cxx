@@ -1040,7 +1040,7 @@ s32 RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, HCURSOR cur)
         desc.dwSize = sizeof(DDSURFACEDESC);
 
         desc.dwFlags = DDSD_CAPS;
-        desc.ddsCaps.dwCaps = 0x200; // TODO
+        desc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
         HRESULT result = DD_OK;
 
@@ -1092,7 +1092,7 @@ s32 RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, HCURSOR cur)
 
             s32 count = 0;
 
-            while (ShowCursor(FALSE) >= 0) { count = count + 1; }
+            do { count = count + 1; } while (ShowCursor(FALSE) >= 0);
 
             COLORREF color = NULL;
 
@@ -1104,7 +1104,7 @@ s32 RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, HCURSOR cur)
 
             HCURSOR cursor = SetCursor(cur);
 
-            while (ShowCursor(TRUE) < 0) { count = count - 1; }
+            do { count = count - 1; } while (ShowCursor(TRUE) < 0);
 
             SetCursor(cur);
 
@@ -1119,7 +1119,7 @@ s32 RADEXPLINK BinkIsSoftwareCursor(void PTR4* lpDDSP, HCURSOR cur)
 
             surface->Unlock(desc.lpSurface);
 
-            while (ShowCursor(FALSE) >= 0) { count = count + 1; }
+            do { count = count + 1; } while (ShowCursor(FALSE) >= 0);
 
             HDC dc = GetDC(wnd);
             const u32 match = GetPixel(dc, target.x, target.y) == color;
