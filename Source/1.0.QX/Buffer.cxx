@@ -193,6 +193,7 @@ void BinkBufferDirectDrawInitialize(HWND wnd, u32 fullscreen)
 {
     if (BufferCount != 0) {
         BufferCount = BufferCount + 1;
+
         return;
     }
 

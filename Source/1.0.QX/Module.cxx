@@ -325,26 +325,26 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
 {
     if (width == 0) { return NULL; }
     if (height == 0) { return NULL; }
-    
+
     u32 buffertype = bufferflags & BINKBUFFERTYPEMASK;
-    
+
     const u32 options = bufferflags & BINKBUFFERSCALES;
     const u32 fullscreen = bufferflags >> 0x17 & 1; // TODO
-    
+
     s32 dc = FALSE, dd = FALSE;
     s32 issoftcur = FALSE;
     s32 overlay = FALSE, offscreen = FALSE;
     s32 noclipping = FALSE;
     u32 scales = 0, surfacetype = 0;
-    
+
     LPDIRECTDRAWCLIPPER clipper = NULL;
     LPDIRECTDRAWSURFACE surface = NULL;
-    
+
     // Notes:
     // 1. If buffer type is BINKBUFFERDIBSECTION then create HDC surface.
     // 2. If buffer type is BINKBUFFERAUTO or BINKBUFFERPRIMARY then create DirectDraw primary surface.
     // 3. Otherwise - create either overlay or offscreen surface, only when DirectDraw is availble.
-    
+
     if (buffertype == BINKBUFFERDIBSECTION) {
         if (BinkBufferDeviceContextInitialize(wnd, fullscreen)) { dc = TRUE; }
         else {
@@ -355,7 +355,7 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
     else {
         dd = TRUE;
         BinkBufferDirectDrawInitialize(wnd, fullscreen);
-    
+
         if (BufferDirectDraw == NULL) {
             if (buffertype != BINKBUFFERAUTO) {
                 radstrcpy(BufferError, "DirectDraw is not available");
@@ -364,20 +364,25 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
                 return NULL;
             }
         }
-        
+
         if (buffertype == BINKBUFFERAUTO) { buffertype = BINKBUFFERPRIMARY; }
     }
-    
+
+    if (!dc && (BufferDirectDraw == NULL || BufferBytes == 0)
+        && BinkBufferDeviceContextInitialize(wnd, fullscreen)) {
+        dc = TRUE;
+    }
+
     // Notes:
     // If the surface is not a HDC surface, then:
     // Set configuration and create objects needed for DirectDraw surfaces.
-    
+
     if (!dc) {
         switch (buffertype) {
         case BINKBUFFERPRIMARY: {
             if (options == 0) {
                 surfacetype = BinkDDSurfaceType(BufferDirectDrawSurface);
-    
+
                 if (surfacetype != BINKSURFACE8P) {
                     if (surfacetype == BINKSURFACENONE) { radstrcpy(BufferError, "Video mode not supported."); }
                     else {
@@ -388,86 +393,86 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
                     }
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERYV12OVERLAY: {
             if ((BufferOverlayCaps & options) == options) {
                 surface = BinkBufferDirectDrawOverlaySurfaceCreate(MAKEFOURCC('Y', 'V', '1', '2'), width, height, BINKSURFACEYV12);
-    
+
                 if (surface != NULL) {
                     overlay = TRUE;
                     surfacetype = BinkDDSurfaceType(surface) | BINKSURFACEDIRECT;
                     scales = BufferOverlayCaps;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERYUY2OVERLAY: {
             if ((BufferOverlayCaps & options) == options) {
                 surface = BinkBufferDirectDrawOverlaySurfaceCreate(MAKEFOURCC('Y', 'U', 'Y', '2'), width, height, BINKSURFACEYUY2);
-    
+
                 if (surface != NULL) {
                     overlay = TRUE;
                     surfacetype = BinkDDSurfaceType(surface) | BINKSURFACEDIRECT;
                     scales = BufferOverlayCaps;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERUYVYOVERLAY: {
             if ((BufferOverlayCaps & options) == options) {
                 surface = BinkBufferDirectDrawOverlaySurfaceCreate(MAKEFOURCC('U', 'Y', 'V', 'Y'), width, height, BINKSURFACEUYVY);
-    
+
                 if (surface != NULL) {
                     overlay = TRUE;
                     surfacetype = BinkDDSurfaceType(surface) | BINKSURFACEDIRECT;
                     scales = BufferOverlayCaps;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERYV12OFFSCREEN: {
             if ((BufferBlitCaps & options) == options) {
                 surface = BinkBufferDirectDrawOffscreenSurfaceCreate(MAKEFOURCC('Y', 'V', '1', '2'), width, height, BINKSURFACEYV12);
-    
+
                 if (surface != NULL) {
                     surfacetype = BinkDDSurfaceType(surface) | (options != 0 ? BINKSURFACESLOW : BINKSURFACEFAST);
                     scales = BufferBlitCaps;
                     offscreen = TRUE;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERYUY2OFFSCREEN:
         {
             if ((BufferBlitCaps & options) == options) {
                 surface = BinkBufferDirectDrawOffscreenSurfaceCreate(MAKEFOURCC('Y', 'U', 'Y', '2'), width, height, BINKSURFACEYUY2);
-    
+
                 if (surface != NULL) {
                     surfacetype = BinkDDSurfaceType(surface) | (options != 0 ? BINKSURFACESLOW : BINKSURFACEFAST);
                     scales = BufferBlitCaps;
                     offscreen = TRUE;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERUYVYOFFSCREEN: {
             if ((BufferBlitCaps & options) == options) {
                 surface = BinkBufferDirectDrawOffscreenSurfaceCreate(MAKEFOURCC('U', 'Y', 'V', 'Y'), width, height, BINKSURFACEUYVY);
-    
+
                 if (surface != NULL) {
                     scales = BufferBlitCaps;
                     surfacetype = BinkDDSurfaceType(surface) | (options != 0 ? BINKSURFACESLOW : BINKSURFACEFAST);
                     offscreen = TRUE;
                 }
             }
-    
+
             break;
         }
         case BINKBUFFERRGBOFFSCREENVIDEO:
@@ -475,45 +480,46 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
             if ((BufferBlitCaps & options) == options) {
                 surface = BinkBufferDirectDrawOffscreenSurfaceCreate(
                     buffertype == BINKBUFFERRGBOFFSCREENVIDEO ? 0 : 1 /* TODO */, width, height, BINKSURFACE8P);
-    
+
                 if (surface != NULL) {
                     surfacetype = BinkDDSurfaceType(surface);
-    
+
                     if (surfacetype != BINKSURFACE8P) {
                         if (surfacetype == BINKSURFACENONE) {
                             surface->Release();
                             surface = NULL;
-    
+
                             radstrcpy(BufferError, "Video mode not supported.");
+
+                            break;
                         }
-    
+
                         surfacetype = surfacetype | (options != 0 ? BINKSURFACESLOW : BINKSURFACEFAST);
                         scales = BufferBlitCaps;
                         offscreen = TRUE;
 
                         break;
                     }
-    
+
                     surface->Release();
                     surface = NULL;
                 }
             }
-    
+
             break;
         }
         }
 
         if (buffertype > BINKBUFFERLAST) {
-            // TODO
-            //if (BufferScreenBits == 0) { radstrcpy(BinkError, "256 color mode not supported."); }
-            //else if (BufferScreenBits > 8) { radstrcpy(BinkError, "No capable blitting style available."); }
+            if (BufferScreenBits == 0) { radstrcpy(BufferError, "256 color mode not supported."); }
+            else if (BufferScreenBits > 8) { radstrcpy(BufferError, "No capable blitting style available."); }
 
             if (!dd) { BinkBufferDirectDrawRelease(); }
             if (dc) { BinkBufferDeviceContextRelease(); }
 
             return NULL;
         }
-    
+
         if (buffertype != BINKBUFFERAUTO) {
             if (surface != NULL) {
                 BufferDirectDraw->CreateClipper(0, &clipper, NULL);
@@ -579,11 +585,22 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
                 return buf;
             }
 
-            // TODO
-            //if (BufferError[0] == NULL) {
-            //    if (BufferScreenBits == 0) { radstrcpy(BinkError, "256 color mode not supported."); }
-            //    else if (BufferScreenBits > 8) { radstrcpy(BinkError, "No capable blitting style available."); }
-            //}
+            if (BufferError[0] == NULL) {
+                if (BufferScreenBits == 0) { radstrcpy(BufferError, "256 color mode not supported."); }
+                else if (BufferScreenBits > 8) { radstrcpy(BufferError, "No capable blitting style available."); }
+
+                if (!dd) { BinkBufferDirectDrawRelease(); }
+                if (dc) { BinkBufferDeviceContextRelease(); }
+
+                return NULL;
+            }
+        }
+
+        BufferError[0] = NULL;
+
+        if (buffertype != BINKBUFFERPRIMARY) {
+            if (BufferScreenBits == 0) { radstrcpy(BufferError, "256 color mode not supported."); }
+            else if (BufferScreenBits > 8) { radstrcpy(BufferError, "No capable blitting style available."); }
 
             if (!dd) { BinkBufferDirectDrawRelease(); }
             if (dc) { BinkBufferDeviceContextRelease(); }
@@ -592,34 +609,29 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
         }
     }
 
-    if (!dc && (BufferDirectDraw == NULL || BufferBytes == 0)
-        && BinkBufferDeviceContextInitialize(wnd, fullscreen)) {
-        dc = TRUE;
-    }
-    
     if (BufferBytes != 0) {
         HDC hdc = GetDC(wnd);
         HDC dibdc = CreateCompatibleDC(hdc);
         ReleaseDC(wnd, hdc);
-    
+
         if (dibdc != NULL) {
             LPBITMAPINFO bmp = (LPBITMAPINFO)radmalloc(BINK_BUFFER_BITMAP_MEMORY_SIZE);
-    
+
             if (bmp != NULL) {
                 radmemset(bmp, 0x00, BINK_BUFFER_BITMAP_MEMORY_SIZE);
-    
+
                 bmp->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
                 bmp->bmiHeader.biWidth = (BufferBytes * width + 0x1F & 0xFFFFFFE0) / BufferBytes;
                 bmp->bmiHeader.biHeight = -1 * (s32)height;
                 bmp->bmiHeader.biPlanes = 1;
                 bmp->bmiHeader.biBitCount = (WORD)(BufferBytes * 8);
                 bmp->bmiHeader.biCompression = BufferBytes == 3 ? BI_BITFIELDS : BI_RGB;
-    
+
                 surfacetype = BinkBufferDeviceContextSurfaceType(hdc, bmp->bmiColors);
-    
+
                 void* buffer = NULL;
                 HBITMAP dib = CreateDIBSection(dibdc, bmp, 0, &buffer, NULL, 0);
-    
+
                 if (dib != NULL) {
                     HGDIOBJ gdi = SelectObject(dibdc, dib);
                     buffertype = BINKBUFFERDIBSECTION;
@@ -627,9 +639,9 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
                     scales = BINKBUFFERSCALES;
 
                     HBINKBUFFER buf = (HBINKBUFFER)radmalloc(sizeof(BINKBUFFER));
-    
+
                     radmemset(buf, 0x00, sizeof(BINKBUFFER));
-    
+
                     buf->Height = height;
                     buf->Width = width;
                     buf->ScaleFlags = scales;
@@ -653,40 +665,40 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
                     buf->dibdc = (u32)dibdc;
                     buf->loadeddd = dd;
                     buf->loadedwin = dc;
-    
+
                     RECT rect;
                     GetWindowRect(wnd, &rect);
-    
+
                     buf->WindowWidth = rect.right - rect.left;
                     buf->WindowHeight = rect.bottom - rect.top;
-    
+
                     buf->ClientOffsetX = rect.left;
                     buf->ClientOffsetY = rect.top;
-    
+
                     rect.left = 0;
                     rect.top = 0;
-    
+
                     ClientToScreen(wnd, (LPPOINT)&rect);
-    
+
                     buf->ClientOffsetX = rect.left - buf->ClientOffsetX;
                     buf->ClientOffsetY = rect.top - buf->ClientOffsetY;
-    
+
                     GetClientRect(wnd, &rect);
-    
+
                     buf->ExtraWindowWidth = buf->WindowWidth - rect.right;
                     buf->ExtraWindowHeight = buf->WindowHeight - rect.bottom;
-    
+
                     buf->WindowWidth = buf->ExtraWindowWidth + buf->Width;
                     buf->WindowHeight = buf->WindowHeight - rect.bottom + buf->Height;
-    
+
                     BinkBufferSetOffset(buf, 0, 0);
                     BinkBufferSetScale(buf, buf->Width, buf->Height);
-    
+
                     if (buf->ddclipper != NULL) { ((LPDIRECTDRAWCLIPPER)buf->ddclipper)->SetHWnd(0, wnd); }
-    
+
                     return buf;
                 }
-    
+
                 DeleteDC(dibdc);
                 radfree(bmp);
             }
@@ -695,7 +707,7 @@ HBINKBUFFER RADEXPLINK BinkBufferOpen(HWND wnd, u32 width, u32 height, u32 buffe
 
     if (!dd) { BinkBufferDirectDrawRelease(); }
     if (dc) { BinkBufferDeviceContextRelease(); }
-    
+
     return NULL;
 }
 

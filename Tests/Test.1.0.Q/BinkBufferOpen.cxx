@@ -30,7 +30,7 @@ SOFTWARE.
 #define WINDOW_WIDTH        640
 #define WINDOW_HEIGHT       480
 
-typedef char* (RADEXPLINK* BINKGETERRORACTION)();
+typedef char* (RADEXPLINK* BINKBUFFERGETERRORACTION)();
 typedef HBINKBUFFER(RADEXPLINK *BINKBUFFEROPENACTION)(HWND wnd, u32 width, u32 height, u32 bufferflags);
 typedef void(RADEXPLINK* BINKBUFFERCLOSEACTION)(HBINKBUFFER buf);
 
@@ -38,6 +38,8 @@ typedef void(RADEXPLINK* BINKBUFFERCLOSEACTION)(HBINKBUFFER buf);
 
 int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
 {
+    if ((a == NULL && b != NULL) || (a != NULL && b == NULL)) { return FALSE; }
+
     if (a == NULL && b == NULL) { return strcmp(ea, eb) == 0; }
 
     int result = TRUE;                                              // Example
@@ -108,7 +110,7 @@ int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
 u32 Execute(u32 type, HWND wnd,
     BINKBUFFEROPENACTION bnko, BINKBUFFEROPENACTION impo,
     BINKBUFFERCLOSEACTION bnkc, BINKBUFFERCLOSEACTION impc,
-    BINKGETERRORACTION bnke, BINKGETERRORACTION impe)
+    BINKBUFFERGETERRORACTION bnke, BINKBUFFERGETERRORACTION impe)
 {
     HBINKBUFFER bb = bnko(wnd, WINDOW_WIDTH, WINDOW_HEIGHT, type);
     HBINKBUFFER bi = impo(wnd, WINDOW_WIDTH, WINDOW_HEIGHT, type);
@@ -121,7 +123,7 @@ u32 Execute(u32 type, HWND wnd,
     return result;
 }
 
-#define TEST(T, W) if (!Execute(T, W, open, BinkBufferOpen, close, BinkBufferClose, error, BinkGetError)) { strcpy(message, #T); return FALSE; }
+#define TEST(T, W) if (!Execute(T, W, open, BinkBufferOpen, close, BinkBufferClose, error, BinkBufferGetError)) { strcpy(message, #T); return FALSE; }
 
 int ExecuteBinkBufferOpen(HMODULE bink, char* message)
 {
@@ -153,8 +155,8 @@ int ExecuteBinkBufferOpen(HMODULE bink, char* message)
         (BINKBUFFEROPENACTION)GetProcAddress(bink, "_BinkBufferOpen@16");
     BINKBUFFERCLOSEACTION close =
         (BINKBUFFERCLOSEACTION)GetProcAddress(bink, "_BinkBufferClose@4");
-    BINKGETERRORACTION error =
-        (BINKGETERRORACTION)GetProcAddress(bink, "_BinkGetError@0");
+    BINKBUFFERGETERRORACTION error =
+        (BINKBUFFERGETERRORACTION)GetProcAddress(bink, "_BinkBufferGetError@0");
 
     TEST(BINKBUFFERAUTO, wnd);
     TEST(BINKBUFFERPRIMARY, wnd);
