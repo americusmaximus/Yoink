@@ -25,9 +25,9 @@ SOFTWARE.
 #include "Thread.hxx"
 
 // 0x1000b440
-BINKTHREADPTR RADEXPLINK CreateBinkThread(THREADACTION action, struct BINK PTR4* bink, void* value)
+HBINKTHREAD RADEXPLINK BinkCreateThread(THREADACTION action, struct BINK PTR4* bink, void* value)
 {
-    BINKTHREADPTR thread = (BINKTHREADPTR)radmalloc(sizeof(BINKTHREAD));
+    HBINKTHREAD thread = (HBINKTHREAD)radmalloc(sizeof(BINKTHREAD));
 
     if (thread == NULL) { return NULL; }
 
@@ -46,13 +46,22 @@ BINKTHREADPTR RADEXPLINK CreateBinkThread(THREADACTION action, struct BINK PTR4*
 }
 
 // 0x1000b4a0
-DWORD WINAPI BinkThreadStartAction(LPVOID lpThreadParameter)
+DWORD WINAPI BinkThreadStartAction(LPVOID tps)
 {
-    BINKTHREADPTR params = (BINKTHREADPTR)lpThreadParameter;
+    HBINKTHREAD params = (HBINKTHREAD)tps;
 
     if (params->Action != NULL) { params->Action(params->Bink, params->Value); }
 
     return 0;
+}
+
+// 0x1000b4c0
+void RADEXPLINK BinkThreadClose(HBINKTHREAD thread)
+{
+    if (thread != NULL) {
+        CloseHandle(thread->Handle);
+        radfree(thread);
+    }
 }
 
 // 0x10008f90
@@ -75,8 +84,8 @@ void RADEXPLINK BinkThreadAction(struct BINK PTR4* bink, void* value)
 
         const u32 end = RADTimerRead();
 
-        if ((start < end) && (start = end + 10, bink->trackindex != DEFAULT_SOUND_TRACK)) {
-            FUN_10008bb0(bink);
+        if ((start < end) && (start = end + 10, bink->trackindex != BINKNOSOUND)) {
+            BinkSoundFrameFill(bink);
         }
 
         if (bink->threadcontrol != THREAD_CONTROL_ACTIVE) {

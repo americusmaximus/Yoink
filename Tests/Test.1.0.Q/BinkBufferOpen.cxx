@@ -36,7 +36,7 @@ typedef void(RADEXPLINK* BINKBUFFERCLOSEACTION)(HBINKBUFFER buf);
 
 #define BINK_BUFFER_OPEN_ADDRESS(X)     ((size_t)X + (0x10006050 - BINK_BASE_ADDRESS))
 
-int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
+static int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
 {
     if ((a == NULL && b != NULL) || (a != NULL && b == NULL)) { return FALSE; }
 
@@ -110,7 +110,7 @@ int BinkBufferCompare(HBINKBUFFER a, char* ea, HBINKBUFFER b, char* eb)
     return result;
 }
 
-u32 Execute(u32 type, HWND wnd,
+static u32 Execute(u32 type, HWND wnd,
     BINKBUFFEROPENACTION bnko, BINKBUFFEROPENACTION impo,
     BINKBUFFERCLOSEACTION bnkc, BINKBUFFERCLOSEACTION impc,
     BINKBUFFERGETERRORACTION bnke, BINKBUFFERGETERRORACTION impe)

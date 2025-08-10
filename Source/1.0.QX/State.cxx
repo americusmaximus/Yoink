@@ -32,4 +32,4 @@ s32         Width;
 s32         FrameRateDiv;
 char        BinkError[MAX_BINK_ERROR_LENGTH];
 
-HANDLE   Instance;
+HANDLE      Instance;

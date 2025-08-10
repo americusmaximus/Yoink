@@ -24,29 +24,29 @@ SOFTWARE.
 
 #include "State.hxx"
 
-RADEXPFUNC void RADEXPLINK ExpandBink(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13, u32 param_14); // TODO
+RADEXPFUNC void RADEXPLINK ExpandBink(void* yp1, void* yp2, void* ap1, void* ap2, void* mp, u32 decompwidth, u32 decompheight, u32 width, u32 height, u32 param_10, u32 key, u32 param_12, u32 flags, u32 type); // TODO
 RADEXPFUNC void RADEXPLINK ExpandBundleSizes(struct BUNDLEPOINTERS* pointers, u32 width);
-RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_16a4bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_16a4bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_16bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_16bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_24bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_24bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_24rbpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_24rbpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32abpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32abpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32bpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32bpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32rabpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32rabpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32rbpp(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_32rbpp_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_UYVY(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_UYVY_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_YUY2(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_YUY2_mask(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
-RADEXPFUNC void RADEXPLINK YUV_blit_YV12(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16a1bpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16a4bpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16a4bpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16bpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_16bpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_24bpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_24bpp_mask(void* dest, u32 destx, u32 desty, s32 destpitch, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_24rbpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_24rbpp_mask(void* dest, u32 destx, u32 desty, s32 destpitch, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32abpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32abpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32bpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32bpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32rabpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32rabpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32rbpp(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_32rbpp_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_UYVY(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_UYVY_mask(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_YUY2(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_YUY2_mask(void* dest, u32 destx, u32 desty, s32 destpitch, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12); // TODO
+RADEXPFUNC void RADEXPLINK YUV_blit_YV12(void* dest, u32 destx, u32 desty, u32 param_4, u32 param_5, u32 param_6, u32 param_7, u32 param_8, u32 param_9, u32 param_10, u32 param_11, u32 param_12, u32 param_13); // TODO
 RADEXPFUNC void RADEXPLINK YUV_init(u32 flags);

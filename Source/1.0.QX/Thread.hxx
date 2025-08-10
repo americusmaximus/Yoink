@@ -37,8 +37,9 @@ typedef struct BINKTHREAD
     void*           Value;
     HANDLE          Handle;
     DWORD           ID;
-} BINKTHREAD, * BINKTHREADPTR;
+} BINKTHREAD, * HBINKTHREAD;
 
-BINKTHREADPTR RADEXPLINK CreateBinkThread(THREADACTION action, struct BINK PTR4* bink, void* value);
-DWORD WINAPI BinkThreadStartAction(LPVOID lpThreadParameter);
+HBINKTHREAD RADEXPLINK BinkCreateThread(THREADACTION action, struct BINK PTR4* bink, void* value);
+DWORD WINAPI BinkThreadStartAction(LPVOID tps);
 void RADEXPLINK BinkThreadAction(struct BINK PTR4* bink, void* value);
+void RADEXPLINK BinkThreadClose(HBINKTHREAD thread);

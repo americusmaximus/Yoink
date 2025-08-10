@@ -41,13 +41,17 @@ int ExecuteBinkIsSoftwareCursor(HMODULE bink, char* message)
     LPDIRECTDRAW dd = NULL;
     LPDIRECTDRAWSURFACE surface = NULL;
 
-    if (FAILED(DirectDrawCreate(NULL, &dd, NULL))) { return FALSE; }
+    if (FAILED(DirectDrawCreate(NULL, &dd, NULL))) {
+        strcpy(message, "Unable to create DirectDraw.");
+        return FALSE;
+    }
 
     DDSURFACEDESC desc;
     radmemset(&desc, 0x00, sizeof(DDSURFACEDESC));
 
     if (FAILED(dd->SetCooperativeLevel(NULL, DDSCL_NORMAL))) {
         dd->Release();
+        strcpy(message, "Unable to set DirectDraw cooperative level.");
         return FALSE;
     }
 
@@ -57,6 +61,7 @@ int ExecuteBinkIsSoftwareCursor(HMODULE bink, char* message)
 
     if (FAILED(dd->CreateSurface(&desc, &surface, NULL))) {
         dd->Release();
+        strcpy(message, "Unable to create DirectDraw surface.");
         return FALSE;
     }
 

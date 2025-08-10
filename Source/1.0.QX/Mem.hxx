@@ -56,6 +56,15 @@ SOFTWARE.
 extern RADMEMALLOC  MemAllocate;    // 0x10041418
 extern RADMEMFREE   MemFree;        // 0x1004141c
 
-void RADEXPLINK QueueBinkMem(void PTR4* mem, size_t size);
-void* AllocateBinkMem(struct BINK PTR4* bink, size_t size);
-void* RADEXPLINK AllocateBinkMem(size_t size);
+void RADEXPLINK BinkQueueMem(void PTR4* mem, size_t size);
+void* BinkAllocateMem(struct BINK PTR4* bink, size_t size);
+void* RADEXPLINK BinkAllocateMem(size_t size);
+
+
+// TODO TEMP
+#define MAX_MEM_ITEM_COUNT  128
+extern size_t  MemSize;                        // 0x10041b80
+extern u32     MemCount;                       // 0x10041b84
+
+extern size_t  MemSizes[MAX_MEM_ITEM_COUNT];   // 0x1004167c
+extern void* MemItems[MAX_MEM_ITEM_COUNT];   // 0x1004187c

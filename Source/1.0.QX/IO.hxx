@@ -35,7 +35,7 @@ byte 3        Bink Video codec revision (0x62, 0x64, 0x66, 0x67, 0x68, 0x69; b,d
 bytes 4-7     file size not including the first 8 bytes
 bytes 8-11    number of frames
 bytes 12-15   largest frame size in bytes
-bytes 16-19   number of frames again?
+bytes 16-19   number of internal frames
 bytes 20-23   video width (less than or equal to 32767)
 bytes 24-27   video height (less than or equal to 32767)
 bytes 28-31   video frames per second dividend
@@ -72,17 +72,16 @@ for each audio track
 
 typedef struct BINKIOHEADER {
     u32 Magic;
-    u32 Size;           // File size, excluding first 8 bytes.
+    u32 Size;           // File size, excluding the first 8 bytes
     u32 Frames;         // Number of frames
     u32 MaxFrameSize;   // Largest frame size in bytes
-    u32 FrameCount;     // Number of frames
+    u32 InternalFrames; // Number of internal frames
     u32 Width;          // Video width
     u32 Height;         // Height
     u32 Dividend;       // Video frames per second dividend
     u32 Divider;        // Video frame per second divider
     u32 Options;        // Flags
     u32 Tracks;         // Number of audio tracks
-    // TODO audio header
 } BINKIOHEADER, * BINKIOHEADERPTR;
 
 s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flags);

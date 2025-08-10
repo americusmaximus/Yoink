@@ -28,7 +28,7 @@ SOFTWARE.
 
 typedef u32(*BINKBUFFERACQUIRECOLORACTION)(u32 value, u32 mask);
 
-u32 Execute(u32 value, u32 mask, BINKBUFFERACQUIRECOLORACTION bnk, BINKBUFFERACQUIRECOLORACTION imp) {
+static u32 Execute(u32 value, u32 mask, BINKBUFFERACQUIRECOLORACTION bnk, BINKBUFFERACQUIRECOLORACTION imp) {
     return bnk(value, mask) == imp(value, mask);
 }
 

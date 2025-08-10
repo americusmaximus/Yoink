@@ -35,13 +35,15 @@ u32     MemCount;                       // 0x10041b84
 size_t  MemSizes[MAX_MEM_ITEM_COUNT];   // 0x1004167c
 void*   MemItems[MAX_MEM_ITEM_COUNT];   // 0x1004187c
 
-#define MEM_ALIGN(size) (size + 0xF & 0xFFFFFFF0) /* x64 */
+#define MEM_ALIGN(size)             (size + 0xF & 0xFFFFFFF0) /* x64 */
+#define MEM_QUEUE_LENGTH(size)      (MEM_ALIGN(size) + (((MemSize >> 5) - (((size + 0xF) >> 5) & 0x1F)) + 1 & 0x1F) * 0x20)
 
 // 0x10007d50
-void RADEXPLINK QueueBinkMem(void PTR4* mem, size_t size)
+// This function accummulates needed memory sizes,
+// so that when BinkAllocateMem function is called all of the accummulated memory is allocated in one chunk.
+void RADEXPLINK BinkQueueMem(void PTR4* mem, size_t size)
 {
-    const size_t length = MEM_ALIGN(size)
-        + (((MemSize >> 5) - (size + 0xf >> 5 & 0x1F)) + 1 & 0x1F) * 0x20; // TODO
+    const size_t length = MEM_QUEUE_LENGTH(size);
 
     MemSize = MemSize + length;
 
@@ -52,7 +54,10 @@ void RADEXPLINK QueueBinkMem(void PTR4* mem, size_t size)
 }
 
 // 0x10007db0
-void* RADEXPLINK AllocateBinkMem(size_t size)
+// This function allocates accumulated through function QueueBinkMem memory needs in one chunk.
+// Then it sets addresses from this one single chunk to previously stored void** pointers.
+// This is used to construct complex ojects on the stack, and then to move them to the heap memory easily.
+void* RADEXPLINK BinkAllocateMem(size_t size)
 {
     const size_t length = MEM_ALIGN(size);
 
@@ -64,7 +69,7 @@ void* RADEXPLINK AllocateBinkMem(size_t size)
         u8* item = (u8*)((size_t)result + length);
 
         for (u32 x = 0; x < MemCount; x++) {
-            MemItems[x] = item;
+            *(void**)MemItems[x] = item;
             item = (u8*)((size_t)item + MemSizes[x]);
         }
     }
@@ -75,9 +80,9 @@ void* RADEXPLINK AllocateBinkMem(size_t size)
 }
 
 // 0x10008ac0
-void* AllocateBinkMem(struct BINK PTR4* bink, size_t size)
+void* BinkAllocateMem(struct BINK PTR4* bink, size_t size)
 {
     bink->totalmem = bink->totalmem + MemSize + size;
 
-    return AllocateBinkMem(size);
+    return BinkAllocateMem(size);
 }

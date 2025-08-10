@@ -20,9 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bink.h" />
+    <ClInclude Include="Bink.hxx" />
     <ClInclude Include="Buffer.hxx" />
     <ClInclude Include="Cursor.hxx" />
     <ClInclude Include="DirectDraw.hxx" />
+    <ClInclude Include="DirectSound.hxx" />
+    <ClInclude Include="Frame.hxx" />
     <ClInclude Include="IO.hxx" />
     <ClInclude Include="Mem.hxx" />
     <ClInclude Include="Module.hxx" />
@@ -31,11 +34,15 @@
     <ClInclude Include="State.hxx" />
     <ClInclude Include="Thread.hxx" />
     <ClInclude Include="Timer.hxx" />
+    <ClInclude Include="WaveOut.hxx" />
     <ClInclude Include="Yoink.hxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bink.cxx" />
     <ClCompile Include="Buffer.cxx" />
     <ClCompile Include="Cursor.cxx" />
+    <ClCompile Include="DirectSound.cxx" />
+    <ClCompile Include="Frame.cxx" />
     <ClCompile Include="IO.cxx" />
     <ClCompile Include="Mem.cxx" />
     <ClCompile Include="Module.cxx" />
@@ -44,6 +51,7 @@
     <ClCompile Include="Thread.cxx" />
     <ClCompile Include="Timer.cxx" />
     <ClCompile Include="Video.cxx" />
+    <ClCompile Include="WaveOut.cxx" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -57,27 +65,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -131,7 +139,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <DisableSpecificWarnings>4047;6031</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4047;6031; 6385;</DisableSpecificWarnings>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <ExceptionHandling>false</ExceptionHandling>
@@ -154,7 +162,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <DisableSpecificWarnings>4047;6031</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4047;6031; 6385;</DisableSpecificWarnings>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <ExceptionHandling>false</ExceptionHandling>
@@ -177,7 +185,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <DisableSpecificWarnings>4047;6031</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4047;6031; 6385;</DisableSpecificWarnings>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <ExceptionHandling>false</ExceptionHandling>
@@ -200,7 +208,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <DisableSpecificWarnings>4047;6031</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4047;6031; 6385;</DisableSpecificWarnings>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <ExceptionHandling>false</ExceptionHandling>

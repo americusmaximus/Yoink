@@ -22,6 +22,43 @@ SOFTWARE.
 
 #pragma once
 
-#include "Yoink.hxx"
+#include "DirectSound.hxx"
+#include "WaveOut.hxx"
 
-void RADEXPLINK FUN_10008bb0(struct BINK PTR4* bink); // TODO
+#define VOLUME_NONE     0
+#define VOLUME_NORMAL   32767
+#define VOLUME_MAX      65535
+
+#define PAN_LEFT        0
+#define PAN_CENTER      32767
+#define PAN_RIGHT       65537
+
+// TODO check all +1, +2, -1 values of volume and pan
+
+#define DEFAULT_SOUND_CHUNK_INDEX               (-1)
+
+#define SOUND_TRACK_TYPE_FREQUENCY(X)           (X & 0xFFFF)
+#define SOUND_TRACK_TYPE_BITS(X)                (((X >> 30) & 1) * 8 + 8)
+#define SOUND_TRACK_TYPE_CHANNELS(X)            (((X >> 29) & 1) + 1)
+#define SOUND_TRACK_TYPE_CONVERT_TO_8BITS(X)    (((X >> 27) & 8) == 0)
+#define SOUND_TRACK_TYPE_IS_ACTIVE(X)           (X & 0x80000000)
+
+#define SOUND_BUFFER_SIZE(X)                    ((X + 0xFF) & 0xFFFFFF00)
+
+extern s32              SoundTrack;         // 0x1003a07c
+
+extern BINKSNDSYSOPEN   SoundOpen;          // 0x10041b88
+extern BINKSNDOPEN      SoundSystem;        // 0x10041b8c
+extern u32              SoundCounter;       // 0x10041b90
+
+typedef struct BINKSNDCOMP
+{
+    // TODO
+} BINKSNDCOMP, * HBINKSNDCOMP;
+
+u32 BinkSoundFrameClear(HBINK bnk);
+void RADEXPLINK BinkSoundCompressorRelease(void* comp);
+void RADEXPLINK BinkSoundFrameFill(HBINK bink);
+u8* BinkSoundConvertTo8Bits(u8* dst, u16* src, size_t size);
+
+HBINKSNDCOMP BinkSoundCompressionInitialize(u32 freq, u32 chans, u32 type);

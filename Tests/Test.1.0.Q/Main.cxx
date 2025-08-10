@@ -25,6 +25,8 @@ SOFTWARE.
 #include "BinkBufferDirectDrawCapabilitiesInitialize.hxx"
 #include "BinkBufferOpen.hxx"
 #include "BinkIsSoftwareCursor.hxx"
+#include "BinkOpen.hxx"
+#include "BinkSoundUseDirectSound.hxx"
 
 #include <stdio.h>
 
@@ -53,12 +55,18 @@ int main(int argc, char** argv) {
     char message[MAX_ERROR_MESSAGE_LENGTH];
     memset(message, 0x00, MAX_ERROR_MESSAGE_LENGTH);
 
-    EXECUTE(BinkBufferAcquireColor);
-    EXECUTE(BinkBufferClear);
-    EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
-    EXECUTE(BinkBufferOpen);
+    //EXECUTE(BinkBufferAcquireColor);
+    //EXECUTE(BinkBufferClear);
+    //EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
+    //EXECUTE(BinkBufferOpen);
 
-    EXECUTE(BinkIsSoftwareCursor);
+    //EXECUTE(BinkIsSoftwareCursor);
+
+    //EXECUTE(BinkOpen);
+
+    EXECUTE(BinkSoundUseDirectSound);
+
+    // TODO Waveout testing
 
     FreeLibrary(bink);
 

@@ -61,7 +61,7 @@ typedef s32  (RADLINK PTR4* BINKSNDONOFF)    (struct BINKSND PTR4* BnkSnd, s32 s
 typedef s32  (RADLINK PTR4* BINKSNDPAUSE)    (struct BINKSND PTR4* BnkSnd, s32 status);
 typedef void (RADLINK PTR4* BINKSNDCLOSE)    (struct BINKSND PTR4* BnkSnd);
 
-typedef BINKSNDOPEN  (RADLINK PTR4* BINKSNDSYSOPEN) (u32 param);
+typedef BINKSNDOPEN  (RADLINK PTR4* BINKSNDSYSOPEN) (void* param);
 
 typedef struct BINKSND {
   BINKSNDREADY Ready;
@@ -143,7 +143,7 @@ typedef struct BINK {
 
   s32 Paused;            // is the bink movie paused?
 
-  u32 BackgroundThread;  // handle to background thread
+  void* BackgroundThread;  // handle to background thread
 
   // everything below is for internal Bink use
 
@@ -210,7 +210,7 @@ typedef struct BINK {
   u8 PTR4* sndend;            // end of the sound buffer
   u8 PTR4* sndwritepos;       // current write position
   u8 PTR4* sndreadpos;        // current read position
-  u32 sndcomp;                // sound compression handle
+  void* sndcomp;              // sound compression handle
   u32 sndamt;                 // amount of sound currently in the buffer
   volatile u32 sndreenter;    // re-entrancy check on the sound
   u32 sndconvert8;            // convert back to 8-bit sound at runtime
@@ -405,7 +405,7 @@ typedef struct BINKTRACK
   u32 MaxSize;
 
   HBINK bink;
-  u32 sndcomp;
+  void* sndcomp;
   s32 trackindex;
 } BINKTRACK;
 
@@ -430,14 +430,14 @@ RADEXPFUNC void RADEXPLINK BinkSetFrameRate(u32 forcerate,u32 forceratediv);
 RADEXPFUNC void RADEXPLINK BinkSetSimulate(u32 sim);
 RADEXPFUNC void RADEXPLINK BinkSetIOSize(u32 iosize);
 
-RADEXPFUNC s32  RADEXPLINK BinkSetSoundSystem(BINKSNDSYSOPEN open, u32 param);
+RADEXPFUNC s32  RADEXPLINK BinkSetSoundSystem(BINKSNDSYSOPEN open, void* param);
 
 #ifdef __RADWIN__
 
-  RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenDirectSound(u32 param); // don't call directly
-  #define BinkSoundUseDirectSound(lpDS) BinkSetSoundSystem(BinkOpenDirectSound,(u32)lpDS)
+  RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenDirectSound(void* param); // don't call directly
+  #define BinkSoundUseDirectSound(lpDS) BinkSetSoundSystem(BinkOpenDirectSound,lpDS)
 
-  RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenWaveOut(u32 param); // don't call directly
+  RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenWaveOut(void* param); // don't call directly
   #define BinkSoundUseWaveOut() BinkSetSoundSystem(BinkOpenWaveOut,0)
 
   #define INCLUDE_MMSYSTEM_H
@@ -555,7 +555,7 @@ typedef struct BINKBUFFER {
   void* ddclipper;
   s32 destx,desty;
   s32 wndx,wndy;
-  u32 wnd;
+  HWND wnd;
   s32 ddoverlay;
   s32 ddoffscreen;
   s32 lastovershow;
@@ -573,8 +573,8 @@ typedef struct BINKBUFFER {
   void* dibbuffer;
   s32 dibpitch;
   void* dibinfo;
-  u32 dibdc;
-  u32 diboldbitmap;
+  HDC dibdc;
+  HGDIOBJ diboldbitmap;
 
 } BINKBUFFER;
 

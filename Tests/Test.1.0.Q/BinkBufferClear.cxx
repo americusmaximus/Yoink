@@ -44,7 +44,7 @@ resolutions[MAX_RESOLUTION_COUNT][MAX_RESOLUTION_DIMENTION_COUNT] =
     { 640, 480 }, { 800, 600 }, { 1024, 768 }
 };
 
-u32 AcquirePitch(u32 type, u32 width) {
+static u32 AcquirePitch(u32 type, u32 width) {
     switch (type)
     {
     case BINKSURFACE8P: { return BufferBytes * width; }
@@ -61,7 +61,7 @@ u32 AcquirePitch(u32 type, u32 width) {
     return BufferBytes * width * 4;
 }
 
-void* AcquireMemory(u32 type, u32 size) {
+static void* AcquireMemory(u32 type, u32 size) {
     void* ptr = malloc(size);
 
     if (ptr == NULL) { return NULL; }
@@ -71,7 +71,7 @@ void* AcquireMemory(u32 type, u32 size) {
     return ptr;
 }
 
-u32 Execute(u32 type, BINKBUFFERCLEARACTION bnk, BINKBUFFERCLEARACTION imp) {
+static u32 Execute(u32 type, BINKBUFFERCLEARACTION bnk, BINKBUFFERCLEARACTION imp) {
     for (s32 i = 0; i < MAX_RESOLUTION_COUNT; i++) {
         const u32 w = resolutions[i][0];
         const u32 h = resolutions[i][1];

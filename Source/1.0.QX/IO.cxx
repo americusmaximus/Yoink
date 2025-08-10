@@ -24,7 +24,7 @@ SOFTWARE.
 
 #define BINKIO_BUFFER_SIZE          0x1000
 #define BINKIO_BUFFER_SIZE_MASK     0xFFFFF000
-#define ALIGNBINKIOBUFFERSIZE(X)    (X + (BINKIO_BUFFER_SIZE - 1) & BINKIO_BUFFER_SIZE_MASK)
+#define ALIGNBINKIOBUFFERSIZE(X)    ((X + (BINKIO_BUFFER_SIZE - 1)) & BINKIO_BUFFER_SIZE_MASK)
 
 BINKIOOPEN  IO;
 u32         IOSize = DEFAULT_IO_SIZE;
@@ -56,7 +56,7 @@ typedef struct BINKIODATA
     // TODO
 } BINKIODATA, * BINKIODATAPTR;
 
-#define ASIODATA(X) (*(BINKIODATAPTR*)(&X->iodata))
+#define ASIODATA(X) ((BINKIODATAPTR)(X->iodata))
 
 // 0x100011b0
 s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flags)
@@ -111,7 +111,7 @@ u32 RADLINK BinkReadFileHeader(struct BINKIO PTR4* io, s32 offset, void PTR4* de
     DWORD read = 0;
     ReadFile(ASIODATA(io)->Handle, dest, size, &read, NULL);
 
-    //ASIODATA(io)->Offset = io->iodata + ASIODATA(io)->Offset + -0x4c; // TODO
+    ASIODATA(io)->Offset = ASIODATA(io)->Offset + read;
     ASIODATA(io)->Unk0x8 = ASIODATA(io)->Offset;
     
     u32 buffSize = ASIODATA(io)->Size - ASIODATA(io)->Offset;
@@ -157,7 +157,7 @@ u32 RADLINK BinkReadFileFrame(struct BINKIO PTR4* io, u32 frame, s32 origofs, vo
             (io->iodata).Unk0x8 = iVar3;
             (io->iodata).BufSize = (int)&io->ReadHeader + (io->iodata).BufSize;
             io->CurBufUsed = io->CurBufUsed - (int)io;
-            uVar6 = (int)&io->ReadHeader + (io->iodata).Unk0xC;
+            uVar6 = (int)&io->ReadHeader + io->iodata.Unk0xC;
             (io->iodata).Unk0xC = uVar6;
 
             if ((uint)(io->iodata).Unk0x20 < uVar6) {
@@ -412,7 +412,7 @@ u32 RADLINK BinkReadFile(struct BINKIO PTR4* io)
 
             io->TotalTime = io->TotalTime + duration;
 
-            if (working == 0 && io->Working == 0) { io->IdleTime = io->IdleTime + duration; }
+            if (!working && !io->Working) { io->IdleTime = io->IdleTime + duration; }
             else { io->ThreadTime = io->ThreadTime + duration; }
         }
     }

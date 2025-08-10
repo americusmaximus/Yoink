@@ -116,7 +116,7 @@ u32 BinkBufferAcquireColor(u32 value, u32 mask)
 void BinkBufferMove(HBINKBUFFER buf, u32 mode)
 {
     if (buf->ddoverlay) {
-        if (IsWindowVisible((HWND)buf->wnd)) {
+        if (IsWindowVisible(buf->wnd)) {
             RECT src, dst;
 
             src.right = buf->Width;
