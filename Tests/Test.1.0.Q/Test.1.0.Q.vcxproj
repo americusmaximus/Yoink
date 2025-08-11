@@ -198,7 +198,9 @@
     <ClCompile Include="BinkIsSoftwareCursor.cxx" />
     <ClCompile Include="BinkOpen.cxx" />
     <ClCompile Include="BinkSoundUseDirectSound.cxx" />
+    <ClCompile Include="BinkSoundUseWaveOut.cxx" />
     <ClCompile Include="Main.cxx" />
+    <ClCompile Include="RadMalloc.cxx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\1.0.QX\1.0.QX.vcxproj">
@@ -214,6 +216,8 @@
     <ClInclude Include="BinkIsSoftwareCursor.hxx" />
     <ClInclude Include="BinkOpen.hxx" />
     <ClInclude Include="BinkSoundUseDirectSound.hxx" />
+    <ClInclude Include="BinkSoundUseWaveOut.hxx" />
+    <ClInclude Include="RadMalloc.hxx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

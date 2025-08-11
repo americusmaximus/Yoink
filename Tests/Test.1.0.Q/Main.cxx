@@ -27,6 +27,8 @@ SOFTWARE.
 #include "BinkIsSoftwareCursor.hxx"
 #include "BinkOpen.hxx"
 #include "BinkSoundUseDirectSound.hxx"
+#include "BinkSoundUseWaveOut.hxx"
+#include "RadMalloc.hxx"
 
 #include <stdio.h>
 
@@ -55,18 +57,33 @@ int main(int argc, char** argv) {
     char message[MAX_ERROR_MESSAGE_LENGTH];
     memset(message, 0x00, MAX_ERROR_MESSAGE_LENGTH);
 
-    //EXECUTE(BinkBufferAcquireColor);
-    //EXECUTE(BinkBufferClear);
-    //EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
-    //EXECUTE(BinkBufferOpen);
+    // Buffer
+    {
+        EXECUTE(BinkBufferAcquireColor);
+        EXECUTE(BinkBufferClear);
+        EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
+        EXECUTE(BinkBufferOpen);
+    }
 
-    //EXECUTE(BinkIsSoftwareCursor);
+    // Bink
+    {
+        EXECUTE(BinkIsSoftwareCursor);
 
-    //EXECUTE(BinkOpen);
+        EXECUTE(BinkOpen);
+    }
 
-    EXECUTE(BinkSoundUseDirectSound);
+    // Sound
+    {
+        EXECUTE(BinkSoundUseDirectSound);
 
-    // TODO Waveout testing
+        // Disabled because it is very, very slow...
+        //EXECUTE(BinkSoundUseWaveOut);
+    }
+
+    // Misc
+    {
+        EXECUTE(RadMalloc);
+    }
 
     FreeLibrary(bink);
 

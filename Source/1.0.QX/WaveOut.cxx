@@ -168,7 +168,7 @@ s32 RADLINK BinkWaveOutReady(struct BINKSND PTR4* snd)
         if (ASSOUNDDATA(snd)->Unk0x8 != 0) { // TODO
             for (u32 x = 0; x < MAX_WAVE_OUT_ITEM_COUNT; x++) {
                 if (!(ASSOUNDDATA(snd)->Headers[x]->dwFlags & WHDR_DONE)) {
-                    const s32 indx = ASSOUNDDATA(snd)->WriteChunk % MAX_WAVE_OUT_ITEM_COUNT;
+                    const s32 indx = (ASSOUNDDATA(snd)->WriteChunk + 1) % MAX_WAVE_OUT_ITEM_COUNT;
 
                     if (ASSOUNDDATA(snd)->Headers[indx]->dwFlags & WHDR_DONE) {
                         ASSOUNDDATA(snd)->LockChunk = indx;
@@ -177,7 +177,7 @@ s32 RADLINK BinkWaveOutReady(struct BINKSND PTR4* snd)
                     }
                 }
             }
-            
+
             snd->SoundDroppedOut = TRUE;
 
             ASSOUNDDATA(snd)->Unk0x8 = 0; // TODO
@@ -186,7 +186,7 @@ s32 RADLINK BinkWaveOutReady(struct BINKSND PTR4* snd)
             ASSOUNDDATA(snd)->LockChunk = DEFAULT_SOUND_CHUNK_INDEX;
         }
 
-        const s32 indx = ASSOUNDDATA(snd)->WriteChunk % MAX_WAVE_OUT_ITEM_COUNT;
+        const s32 indx = (ASSOUNDDATA(snd)->WriteChunk + 1) % MAX_WAVE_OUT_ITEM_COUNT;
 
         if (ASSOUNDDATA(snd)->Headers[indx]->dwFlags & WHDR_DONE) {
             ASSOUNDDATA(snd)->LockChunk = indx;
