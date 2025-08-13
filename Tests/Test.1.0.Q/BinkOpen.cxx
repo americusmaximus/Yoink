@@ -39,6 +39,31 @@ typedef void(RADEXPLINK *BINKCLOSEACTION)(HBINK bnk);
 #define BINK_MEM_SIZES_ADDRESS(X)   ((size_t)X + (0x1004167c - BINK_BASE_ADDRESS))
 #define BINK_MEM_ITEMS_ADDRESS(X)   ((size_t)X + (0x1004187c - BINK_BASE_ADDRESS))
 
+typedef struct BINKIODATA
+{
+    HANDLE          Handle;             // 0x0
+    s32             HeaderOffset;       // 0x4 // TODO Name
+    s32             DataOffset;         // 0x8 // TODO Name
+    void*           Buffer;             // 0xC // TODO Name
+    s32             BufferSize;         // 0x10 // TODO Name
+    volatile s32    ReadCount;          // 0x14
+    volatile s32    Unk0x18;            // 0x18 // TODO Some sort of lock
+    void*           Unk0x1C;            // 0x1C // TODO Buffer
+    void*           Unk0x20;            // 0x20 // TODO Buffer
+    void*           Unk0x24;            // 0x24 // TODO Buffer
+    u32             IsExternal;         // 0x28
+    u32             FilePointer;        // 0x2c
+    s32             FileSize;           // 0x30
+
+    // This value is set in bytes per second,
+    // use 150,000 for a 1xCD, 300,000 for a 2xCD, and 600,000 for a 4xCD. 
+    u32             SimulateRate;       // 0x34
+    u32             SimulateDelay;      // 0x38
+    s32             Unk0x3C;            // 0x3C // TODO
+} BINKIODATA, * BINKIODATAPTR;
+
+#define ASIODATA(X) ((BINKIODATAPTR)(X->iodata))
+
 static u32 CompareBink(HBINK a, HBINK b)
 {
     u32 result = TRUE;
@@ -120,7 +145,56 @@ static u32 CompareBink(HBINK a, HBINK b)
         }
     }
 
-    // TODO Compare bio
+    // IO
+    result &= a->bio.bink == a && b->bio.bink == b;
+    result &= a->bio.ReadError == b->bio.ReadError;
+    result &= a->bio.DoingARead == b->bio.DoingARead;
+    result &= a->bio.BytesRead == b->bio.BytesRead;
+    result &= a->bio.Working == b->bio.Working;
+    //result &= a->bio.TotalTime == b->bio.TotalTime;
+    //result &= a->bio.ForegroundTime == b->bio.ForegroundTime;
+    //result &= a->bio.IdleTime == b->bio.IdleTime;;
+    //result &= a->bio.ThreadTime == b->bio.ThreadTime;
+    result &= a->bio.BufSize == b->bio.BufSize;
+    result &= a->bio.BufHighUsed == b->bio.BufHighUsed;
+    result &= a->bio.CurBufSize == b->bio.CurBufSize;
+    result &= a->bio.CurBufUsed == b->bio.CurBufUsed;
+
+    {
+        BINKIODATAPTR aio = (BINKIODATAPTR)a->bio.iodata;
+        BINKIODATAPTR bio = (BINKIODATAPTR)b->bio.iodata;
+
+        result &= (aio->Handle == NULL && bio->Handle == NULL)
+            || (aio->Handle != NULL && bio->Handle != NULL);
+
+        result &= aio->HeaderOffset == bio->HeaderOffset;
+        result &= aio->DataOffset == bio->DataOffset;
+
+        result &= (aio->Buffer == NULL && bio->Buffer == NULL)
+            || (aio->Buffer != NULL && bio->Buffer != NULL);
+
+        // TODO Buffer content
+
+        result &= aio->BufferSize == bio->BufferSize;
+        result &= aio->ReadCount == bio->ReadCount;
+        result &= aio->Unk0x18 == bio->Unk0x18;
+
+        result &= (aio->Unk0x1C == NULL && bio->Unk0x1C == NULL)
+            || (aio->Unk0x1C != NULL && bio->Unk0x1C != NULL);
+
+        result &= (aio->Unk0x20 == NULL && bio->Unk0x20 == NULL)
+            || (aio->Unk0x20 != NULL && bio->Unk0x20 != NULL);
+
+        result &= (aio->Unk0x24 == NULL && bio->Unk0x24 == NULL)
+            || (aio->Unk0x24 != NULL && bio->Unk0x24 != NULL);
+
+        result &= aio->IsExternal == bio->IsExternal;
+        result &= aio->FilePointer == bio->FilePointer;
+        result &= aio->FileSize == bio->FileSize;
+        result &= aio->SimulateRate == bio->SimulateRate;
+        result &= aio->SimulateDelay == bio->SimulateDelay;
+        result &= aio->Unk0x3C == bio->Unk0x3C;
+    }
 
     result &= (a->ioptr == NULL && b->ioptr == NULL) || (a->ioptr != NULL && b->ioptr != NULL);
 

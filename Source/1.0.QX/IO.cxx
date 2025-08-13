@@ -32,28 +32,24 @@ u32         IOSize = DEFAULT_IO_SIZE;
 typedef struct BINKIODATA
 {
     HANDLE          Handle;             // 0x0
-    s32             Offset;             // 0x4
-    s32             Unk0x8;             // 0x8  // TODO Another file offset
-    void*           Unk0xC;             // 0xC  // TODO Buffer
-    s32             BufSize;            // 0x10
-    volatile s8     Unk0x14;            // 0x14 // TODO Some sort of lock
-    volatile s8     Unk0x18;            // 0x18 // TODO Some sort of lock
+    s32             HeaderOffset;       // 0x4 // TODO Name
+    s32             DataOffset;         // 0x8 // TODO Name
+    void*           Buffer;             // 0xC // TODO Name
+    s32             BufferSize;         // 0x10 // TODO Name
+    volatile s32    ReadCount;          // 0x14
+    volatile s32    Unk0x18;            // 0x18 // TODO Some sort of lock
     void*           Unk0x1C;            // 0x1C // TODO Buffer
     void*           Unk0x20;            // 0x20 // TODO Buffer
     void*           Unk0x24;            // 0x24 // TODO Buffer
     u32             IsExternal;         // 0x28
-    u32             Pointer;            // 0x2c
-    s32             Size;               // 0x30
+    u32             FilePointer;        // 0x2c
+    s32             FileSize;           // 0x30
 
     // This value is set in bytes per second,
     // use 150,000 for a 1xCD, 300,000 for a 2xCD, and 600,000 for a 4xCD. 
-    u32             Simulate;           // 0x34
-
-    u32             Unk0x38;            // 0x38 // TODO Simulate delay
+    u32             SimulateRate;       // 0x34
+    u32             SimulateDelay;      // 0x38
     s32             Unk0x3C;            // 0x3C // TODO
-
-
-    // TODO
 } BINKIODATA, * BINKIODATAPTR;
 
 #define ASIODATA(X) ((BINKIODATAPTR)(X->iodata))
@@ -63,7 +59,14 @@ s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flag
 {
     radmemset(io, 0x00, sizeof(BINKIO));
 
-    if (!(flags & BINKFILEHANDLE)) {
+    if (flags & BINKFILEHANDLE) {
+        HANDLE handle = (HANDLE)name;
+
+        ASIODATA(io)->Handle = handle;
+        ASIODATA(io)->IsExternal = TRUE;
+        ASIODATA(io)->FilePointer = SetFilePointer(handle, 0, NULL, FILE_CURRENT);
+    }
+    else {
         ASIODATA(io)->Handle = CreateFileA(name, GENERIC_READ,
             FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -74,13 +77,6 @@ s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flag
         }
 
         if (ASIODATA(io)->Handle == INVALID_HANDLE_VALUE) { return FALSE; }
-    }
-    else {
-        HANDLE handle = (HANDLE)name;
-
-        ASIODATA(io)->Handle = handle;
-        ASIODATA(io)->IsExternal = TRUE;
-        ASIODATA(io)->Pointer = SetFilePointer(handle, 0, NULL, FILE_CURRENT);
     }
 
     io->ReadHeader      = BinkReadFileHeader;
@@ -96,31 +92,31 @@ s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flag
 // 0x10001270
 u32 RADLINK BinkReadFileHeader(struct BINKIO PTR4* io, s32 offset, void PTR4* dest, u32 size)
 {
-    ASIODATA(io)->Unk0x14++;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
 
-    while (ASIODATA(io)->Unk0x18) {
+    while (ASIODATA(io)->Unk0x18 != 0) {
         Sleep(1);
         BinkService(io->bink);
     }
 
-    if (offset != -1 && ASIODATA(io)->Offset != offset) {
-        SetFilePointer(ASIODATA(io)->Handle, ASIODATA(io)->Pointer + offset, NULL, FILE_BEGIN);
-        ASIODATA(io)->Offset = offset;
+    if (offset != -1 && ASIODATA(io)->HeaderOffset != offset) {
+        SetFilePointer(ASIODATA(io)->Handle, ASIODATA(io)->FilePointer + offset, NULL, FILE_BEGIN);
+        ASIODATA(io)->HeaderOffset = offset;
     }
 
     DWORD read = 0;
     ReadFile(ASIODATA(io)->Handle, dest, size, &read, NULL);
 
-    ASIODATA(io)->Offset = ASIODATA(io)->Offset + read;
-    ASIODATA(io)->Unk0x8 = ASIODATA(io)->Offset;
-    
-    u32 buffSize = ASIODATA(io)->Size - ASIODATA(io)->Offset;
+    ASIODATA(io)->HeaderOffset = ASIODATA(io)->HeaderOffset + read;
+    ASIODATA(io)->DataOffset = ASIODATA(io)->HeaderOffset;
+
+    u32 buffSize = ASIODATA(io)->FileSize - ASIODATA(io)->HeaderOffset;
 
     if (io->BufSize <= buffSize) { buffSize = io->BufSize; }
 
     io->CurBufSize = buffSize;
 
-    ASIODATA(io)->Unk0x14--;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1;
 
     return read;
 }
@@ -128,162 +124,148 @@ u32 RADLINK BinkReadFileHeader(struct BINKIO PTR4* io, s32 offset, void PTR4* de
 // 0x10001320
 u32 RADLINK BinkReadFileFrame(struct BINKIO PTR4* io, u32 frame, s32 origofs, void PTR4* dest, u32 size)
 {
-    /*
-    TODO
-
-    bVar4 = false;
-    local_8 = 0;
-
+    // TODO refactor this!
     if (io->ReadError) { return 0; }
 
+    u32 result = 0;
+    u32 enter = FALSE;
+
     const u32 start = RADTimerRead();
-    iVar3 = origofs;
 
-    if ((origofs != -1) && ((io->iodata).Unk0x8 != origofs)) {
-        origofs = (int)&(io->iodata).Unk0x14;
-        bVar4 = true;
-        LOCK();
-        *(char*)origofs = *(char*)origofs + '\x01';
-        UNLOCK();
+    if (origofs != -1 && ASIODATA(io)->DataOffset != origofs) {
+        enter = TRUE;
 
-        while (ASIODATA(io)->Unk0x18) {
+        ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
+
+        while (ASIODATA(io)->Unk0x18 != 0) {
             Sleep(1);
             BinkService(io->bink);
         }
 
-        uVar6 = (io->iodata).Unk0x8;
-        if ((uVar6 < (uint)iVar3) && ((uint)iVar3 <= (uint)(io->iodata).Offset)) {
-            io = (BINKIO*)(iVar3 - uVar6);
-            (io->iodata).Unk0x8 = iVar3;
-            (io->iodata).BufSize = (int)&io->ReadHeader + (io->iodata).BufSize;
-            io->CurBufUsed = io->CurBufUsed - (int)io;
-            uVar6 = (int)&io->ReadHeader + io->iodata.Unk0xC;
-            (io->iodata).Unk0xC = uVar6;
+        if (ASIODATA(io)->DataOffset < origofs && origofs <= ASIODATA(io)->HeaderOffset) {
+            const s32 offset = origofs - ASIODATA(io)->DataOffset;
 
-            if ((uint)(io->iodata).Unk0x20 < uVar6) {
-                (io->iodata).Unk0xC = uVar6 - io->BufSize;
+            ASIODATA(io)->DataOffset = origofs;
+            ASIODATA(io)->BufferSize = ASIODATA(io)->BufferSize + offset;
+
+            io->CurBufUsed = io->CurBufUsed - offset;
+
+            ASIODATA(io)->Buffer = (void*)((size_t)ASIODATA(io)->Buffer + offset);
+
+            if (ASIODATA(io)->Unk0x20 < ASIODATA(io)->Buffer) {
+                ASIODATA(io)->Buffer = (void*)((size_t)ASIODATA(io)->Buffer - io->BufSize);
             }
         }
         else {
-            SetFilePointer(ASIODATA(io)->Handle, ASIODATA(io)->Pointer + iVar3, NULL, FILE_BEGIN);
+            SetFilePointer(ASIODATA(io)->Handle, ASIODATA(io)->FilePointer + origofs, NULL, FILE_BEGIN);
 
-            (io->iodata).Offset = iVar3;
-            (io->iodata).Unk0x8 = iVar3;
-            (io->iodata).BufSize = io->BufSize;
+            ASIODATA(io)->HeaderOffset = origofs;
+            ASIODATA(io)->DataOffset = origofs;
+            ASIODATA(io)->BufferSize = io->BufSize;
 
             io->CurBufUsed = 0;
 
-            uVar2 = (io->iodata).Unk0x1C;
-            (io->iodata).Unk0xC = uVar2;
-            (io->iodata).Unk0x24 = uVar2;
+            ASIODATA(io)->Buffer = ASIODATA(io)->Unk0x1C;
+            ASIODATA(io)->Unk0x24 = ASIODATA(io)->Unk0x1C;
         }
     }
 
     do {
         if (io->CurBufUsed != 0) {
-            uVar6 = io->CurBufUsed;
-            if (size < io->CurBufUsed) {
-                uVar6 = size;
+            const u32 used = size < io->CurBufUsed ? size : io->CurBufUsed;
+
+            size = size - used;
+
+            ASIODATA(io)->DataOffset = ASIODATA(io)->DataOffset + used;
+
+            result = result + used;
+
+            const size_t length = (size_t)ASIODATA(io)->Unk0x20 - (size_t)ASIODATA(io)->Buffer;
+
+            if (length <= used) {
+                radmemcpy(dest, ASIODATA(io)->Buffer, length);
+
+                dest = (void*)((size_t)dest + length);
+
+                ASIODATA(io)->Buffer = ASIODATA(io)->Unk0x1C;
+
+                io->CurBufUsed = io->CurBufUsed - length;
+
+                ASIODATA(io)->BufferSize = ASIODATA(io)->BufferSize + length;
+
+                if (used == length) goto LAB_100014ad; // TODO
             }
-            puVar9 = (undefined4*)(io->iodata).Unk0xC;
-            size = size - uVar6;
-            puVar10 = &(io->iodata).Unk0x8;
-            *puVar10 = *puVar10 + uVar6;
-            origofs = (io->iodata).Unk0x20 - (int)puVar9;
-            local_8 = local_8 + uVar6;
-            if ((uint)origofs <= uVar6) {
-                puVar10 = (undefined4*)dest;
-                for (uVar7 = (uint)origofs >> 2; uVar7 != 0; uVar7 = uVar7 - 1) {
-                    *puVar10 = *puVar9;
-                    puVar9 = puVar9 + 1;
-                    puVar10 = puVar10 + 1;
-                }
-                for (uVar7 = origofs & 3; uVar7 != 0; uVar7 = uVar7 - 1) {
-                    *(undefined*)puVar10 = *(undefined*)puVar9;
-                    puVar9 = (undefined4*)((int)puVar9 + 1);
-                    puVar10 = (undefined4*)((int)puVar10 + 1);
-                }
-                dest = (void*)((int)dest + origofs);
-                (io->iodata).Unk0xC = (io->iodata).Unk0x1C;
-                uVar6 = uVar6 - origofs;
-                io->CurBufUsed = io->CurBufUsed - origofs;
-                (io->iodata).BufSize = (io->iodata).BufSize + origofs;
-                if (uVar6 == 0) goto LAB_100014ad;
-            }
-            puVar10 = (undefined4*)(io->iodata).Unk0xC;
-            puVar9 = (undefined4*)dest;
-            for (uVar7 = uVar6 >> 2; uVar7 != 0; uVar7 = uVar7 - 1) {
-                *puVar9 = *puVar10;
-                puVar10 = puVar10 + 1;
-                puVar9 = puVar9 + 1;
-            }
-            for (uVar7 = uVar6 & 3; uVar7 != 0; uVar7 = uVar7 - 1) {
-                *(undefined*)puVar9 = *(undefined*)puVar10;
-                puVar10 = (undefined4*)((int)puVar10 + 1);
-                puVar9 = (undefined4*)((int)puVar9 + 1);
-            }
-            dest = (void*)((int)dest + uVar6);
-            (io->iodata).Unk0xC = (io->iodata).Unk0xC + uVar6;
-            io->CurBufUsed = io->CurBufUsed - uVar6;
-            (io->iodata).BufSize = (io->iodata).BufSize + uVar6;
+
+            radmemcpy(dest, ASIODATA(io)->Buffer, used);
+
+            dest = (void*)((size_t)dest + used);
+
+            ASIODATA(io)->Buffer = (void*)((size_t)ASIODATA(io)->Buffer + used);
+
+            io->CurBufUsed = io->CurBufUsed - used;
+
+            ASIODATA(io)->BufferSize = ASIODATA(io)->BufferSize + used;
         }
+
     LAB_100014ad:
         if (size == 0) {
-            uVar6 = RADTimerRead();
-            uVar5 = (uVar6 - start) + io->ForegroundTime;
-            goto LAB_1000157f;
+            io->ForegroundTime = io->ForegroundTime + RADTimerRead() - start;
+
+            const u32 length = ASIODATA(io)->FileSize - ASIODATA(io)->DataOffset;
+
+            io->CurBufSize = io->BufSize <= length ? io->BufSize : length;
+
+            if (io->CurBufSize < io->CurBufUsed + BINKIO_BUFFER_SIZE) {
+                io->CurBufSize = io->CurBufUsed;
+            }
+
+            if (enter) { ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1; }
+
+            return result;
         }
-        if (bVar4) {
-            uVar7 = RADTimerRead();
+
+        if (enter) {
+            const u32 time = RADTimerRead();
 
             DWORD read = 0;
             ReadFile(ASIODATA(io)->Handle, dest, size, &read, NULL);
 
             if (read < size) { io->ReadError = TRUE; }
 
-            ASIODATA(io)->Offset = (int)&io->ReadHeader + ASIODATA(io)->Offset;
-            puVar10 = &(io->iodata).Unk0x8;
-            *puVar10 = (int)&io->ReadHeader + *puVar10;
-            io->BytesRead = (int)&io->ReadHeader + io->BytesRead;
+            ASIODATA(io)->HeaderOffset = ASIODATA(io)->HeaderOffset + read;
+            ASIODATA(io)->DataOffset = ASIODATA(io)->DataOffset + read;
 
-            local_8 = (int)&io->ReadHeader + local_8;
+            io->BytesRead = io->BytesRead + read;
 
-            if (ASIODATA(io)->Simulate) { BinkReadFileSimulate(io, read, uVar7); }
+            result = result + read;
 
-            uVar6 = RADTimerRead();
-            io->TotalTime = (uVar6 - uVar7) + io->TotalTime;
-            uVar5 = (uVar6 - uVar5) + io->ForegroundTime;
-        LAB_1000157f:
-            io->ForegroundTime = uVar5;
-            uVar5 = (io->iodata).Size - (io->iodata).Unk0x8;
-            if (io->BufSize <= uVar5) {
-                uVar5 = io->BufSize;
-            }
-            io->CurBufSize = uVar5;
-            if (io->CurBufSize < io->CurBufUsed + BINKIO_BUFFER_SIZE) {
-                io->CurBufSize = io->CurBufUsed;
-            }
-            if (bVar4) {
-                pcVar8 = &(io->iodata).Unk0x14;
-                LOCK();
-                *pcVar8 = *pcVar8 + -1;
-                UNLOCK();
-            }
-            return local_8;
+            if (ASIODATA(io)->SimulateRate != 0) { BinkReadFileSimulate(io, read, time); }
+
+            const u32 end = RADTimerRead();
+
+            io->TotalTime = io->TotalTime + end - time;
+            io->ForegroundTime = io->ForegroundTime + end - time;
+
+            const u32 length = ASIODATA(io)->FileSize - ASIODATA(io)->DataOffset;
+
+            io->CurBufSize = io->BufSize <= length ? io->BufSize : length;
+
+            if (io->CurBufSize < io->CurBufUsed + BINKIO_BUFFER_SIZE) { io->CurBufSize = io->CurBufUsed; }
+
+            if (enter) { ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1; }
+
+            return result;
         }
-        origofs = (int)&(io->iodata).Unk0x14;
-        bVar4 = true;
-        LOCK();
-        *(char*)origofs = *(char*)origofs + '\x01';
-        UNLOCK();
 
-        while (ASIODATA(io)->Unk0x18) {
+        enter = TRUE;
+
+        ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
+
+        while (ASIODATA(io)->Unk0x18 != 0) {
             Sleep(1);
             BinkService(io->bink);
         }
-    } while (true);
-    */
-    return 0; // TODO
+    } while (TRUE);
 }
 
 // 0x100015d0
@@ -291,18 +273,18 @@ void BinkReadFileSimulate(struct BINKIO PTR4* io, u32 size, u32 time)
 {
     u32 start = RADTimerRead();
 
-    ASIODATA(io)->Unk0x38 =
-        ASIODATA(io)->Unk0x38 + (size * 1000 / ASIODATA(io)->Simulate) - start + time;
+    ASIODATA(io)->SimulateDelay =
+        ASIODATA(io)->SimulateDelay + (size * 1000 / ASIODATA(io)->SimulateRate) - start + time;
 
-    while (0 < ASIODATA(io)->Unk0x38) {
+    while (0 < ASIODATA(io)->SimulateDelay) {
         u32 current = 0;
 
         do {
             Sleep(1);
             current = RADTimerRead();
-        } while (current - start < ASIODATA(io)->Unk0x38);
+        } while (current - start < ASIODATA(io)->SimulateDelay);
 
-        ASIODATA(io)->Unk0x38 = ASIODATA(io)->Unk0x38 + start - current;
+        ASIODATA(io)->SimulateDelay = ASIODATA(io)->SimulateDelay + start - current;
 
         start = current;
     }
@@ -311,14 +293,14 @@ void BinkReadFileSimulate(struct BINKIO PTR4* io, u32 size, u32 time)
 // 0x10001660
 u32 RADLINK BinkGetFileBufferSize(struct BINKIO PTR4* io, u32 size)
 {
-    ASIODATA(io)->Unk0x14++;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
 
-    while (ASIODATA(io)->Unk0x18) {
+    while (ASIODATA(io)->Unk0x18 != 0) {
         Sleep(1);
         BinkService(io->bink);
     }
     
-    ASIODATA(io)->Unk0x14--;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1;
 
     return ALIGNBINKIOBUFFERSIZE(size);
 }
@@ -326,9 +308,9 @@ u32 RADLINK BinkGetFileBufferSize(struct BINKIO PTR4* io, u32 size)
 // 0x100016c0
 void RADLINK BinkSetFileInfo(struct BINKIO PTR4* io, void PTR4* buf, u32 size, u32 fileSize, u32 simulate)
 {
-    ASIODATA(io)->Unk0x14++;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
 
-    while (ASIODATA(io)->Unk0x18) {
+    while (ASIODATA(io)->Unk0x18 != 0) {
         Sleep(1);
         BinkService(io->bink);
     }
@@ -336,35 +318,35 @@ void RADLINK BinkSetFileInfo(struct BINKIO PTR4* io, void PTR4* buf, u32 size, u
     const u32 length = size & BINKIO_BUFFER_SIZE_MASK;
 
     ASIODATA(io)->Unk0x1C = buf;
-    ASIODATA(io)->Unk0xC = buf;
+    ASIODATA(io)->Buffer = buf;
     ASIODATA(io)->Unk0x24 = buf;
     ASIODATA(io)->Unk0x20 = (void*)((size_t)buf + length);
 
     io->BufSize = length;
     
-    ASIODATA(io)->BufSize = length;
+    ASIODATA(io)->BufferSize = length;
 
     io->CurBufUsed = 0;
 
-    ASIODATA(io)->Size = fileSize;
-    ASIODATA(io)->Simulate = simulate;
+    ASIODATA(io)->FileSize = fileSize;
+    ASIODATA(io)->SimulateRate = simulate;
 
-    ASIODATA(io)->Unk0x14--;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1;
 }
 
 // 0x10001740
 void RADLINK BinkCloseFile(struct BINKIO PTR4* io)
 {
-    ASIODATA(io)->Unk0x14++;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
 
-    while (ASIODATA(io)->Unk0x18) {
+    while (ASIODATA(io)->Unk0x18 != 0) {
         Sleep(1);
         BinkService(io->bink);
     }
 
     if (!ASIODATA(io)->IsExternal) { CloseHandle(ASIODATA(io)->Handle); }
 
-    ASIODATA(io)->Unk0x14--;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1;
 }
 
 // 0x100017a0
@@ -377,12 +359,12 @@ u32 RADLINK BinkReadFile(struct BINKIO PTR4* io)
 
     if (io->ReadError) { return 0; }
 
-    ASIODATA(io)->Unk0x18++;
-    ASIODATA(io)->Unk0x14++;
+    ASIODATA(io)->Unk0x18 = ASIODATA(io)->Unk0x18 + 1;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount + 1;
 
-    if (ASIODATA(io)->Unk0x18 == 1 && ASIODATA(io)->Unk0x14 == 1) {
-        if (ASIODATA(io)->BufSize < BINKIO_BUFFER_SIZE
-            || (ASIODATA(io)->Size - ASIODATA(io)->Offset < BINKIO_BUFFER_SIZE)) {
+    if (ASIODATA(io)->Unk0x18 == 1 && ASIODATA(io)->ReadCount == 1) {
+        if (ASIODATA(io)->BufferSize < BINKIO_BUFFER_SIZE
+            || (ASIODATA(io)->FileSize - ASIODATA(io)->HeaderOffset < BINKIO_BUFFER_SIZE)) {
             io->CurBufSize = io->CurBufUsed;
         }
         else {
@@ -396,17 +378,18 @@ u32 RADLINK BinkReadFile(struct BINKIO PTR4* io)
 
             io->BytesRead = io->BytesRead + read;
 
-            ASIODATA(io)->Offset = ASIODATA(io)->Offset + read;
+            ASIODATA(io)->HeaderOffset = ASIODATA(io)->HeaderOffset + read;
             ASIODATA(io)->Unk0x24 = (void*)((size_t)ASIODATA(io)->Unk0x24 + read);
 
             if (ASIODATA(io)->Unk0x20 <= ASIODATA(io)->Unk0x24) { ASIODATA(io)->Unk0x24 = ASIODATA(io)->Unk0x1C; }
             
-            ASIODATA(io)->BufSize = ASIODATA(io)->BufSize - read;
+            ASIODATA(io)->BufferSize = ASIODATA(io)->BufferSize - read;
+
             io->CurBufUsed = io->CurBufUsed + read;
 
             if (io->BufHighUsed < io->CurBufUsed) { io->BufHighUsed = io->CurBufUsed; }
 
-            if (ASIODATA(io)->Simulate) { BinkReadFileSimulate(io, read, start); }
+            if (ASIODATA(io)->SimulateRate != 0) { BinkReadFileSimulate(io, read, start); }
 
             const u32 duration = RADTimerRead() - start;
 
@@ -418,8 +401,8 @@ u32 RADLINK BinkReadFile(struct BINKIO PTR4* io)
     }
     else { wait = TRUE; read = INVALID_FILE_SIZE; }
 
-    ASIODATA(io)->Unk0x14--;
-    ASIODATA(io)->Unk0x18--;
+    ASIODATA(io)->ReadCount = ASIODATA(io)->ReadCount - 1;
+    ASIODATA(io)->Unk0x18 = ASIODATA(io)->Unk0x18 - 1;
 
     if (wait) { Sleep(1); }
 

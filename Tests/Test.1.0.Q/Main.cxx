@@ -58,23 +58,23 @@ int main(int argc, char** argv) {
     memset(message, 0x00, MAX_ERROR_MESSAGE_LENGTH);
 
     // Buffer
-    {
-        EXECUTE(BinkBufferAcquireColor);
-        EXECUTE(BinkBufferClear);
-        EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
-        EXECUTE(BinkBufferOpen);
-    }
+    //{
+    //    EXECUTE(BinkBufferAcquireColor);
+    //    EXECUTE(BinkBufferClear);
+    //    EXECUTE(BinkBufferDirectDrawCapabilitiesInitialize);
+    //    EXECUTE(BinkBufferOpen);
+    //}
 
     // Bink
     {
-        EXECUTE(BinkIsSoftwareCursor);
+    //    EXECUTE(BinkIsSoftwareCursor);
 
         EXECUTE(BinkOpen);
     }
 
     // Sound
     {
-        EXECUTE(BinkSoundUseDirectSound);
+    //    EXECUTE(BinkSoundUseDirectSound);
 
         // Disabled because it is very, very slow...
         //EXECUTE(BinkSoundUseWaveOut);
