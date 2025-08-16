@@ -26,50 +26,6 @@ SOFTWARE.
 
 #define DEFAULT_IO_SIZE (-1)
 
-/*
-https://wiki.multimedia.cx/index.php/Bink_Container
-
-bytes 0-2     file signature ('BIK', or 'KB2' for Bink Video 2)
-byte 3        Bink Video codec revision (0x62, 0x64, 0x66, 0x67, 0x68, 0x69; b,d,f,g,h,i respectively)
-              Bink Video 2 codec revision ('a', 'd', 'f', 'g', 'h', 'i')
-bytes 4-7     file size not including the first 8 bytes
-bytes 8-11    number of frames
-bytes 12-15   largest frame size in bytes
-bytes 16-19   number of internal frames
-bytes 20-23   video width (less than or equal to 32767)
-bytes 24-27   video height (less than or equal to 32767)
-bytes 28-31   video frames per second dividend
-bytes 32-35   video frames per second divider
-bytes 36-39   video flags
-                 bits 28-31: width and height scaling
-                   1 = 2x height doubled
-                   2 = 2x height interlaced
-                   3 = 2x width doubled
-                   4 = 2x width and height-doubled
-                   5 = 2x width and height-interlaced
-                 bit 20: has alpha plane
-                 bit 17: grayscale
-bytes 40-43   number of audio tracks (less than or equal to 256)
-
-for each audio track
-   two bytes   unknown
-   two bytes   audio channels (1 or 2). Not authoritative, see flags below.
-
-for each audio track
-   two bytes   audio sample rate (Hz)
-   two bytes   flags
-                 bit 15: unknown (observed in some samples)
-                 bit 14: unknown (observed in some samples)
-                 bit 13: stereo flag
-                 bit 12: Bink Audio algorithm
-                   1 = use Bink Audio DCT
-                   0 = use Bink Audio FFT
-
-for each audio track
-   four bytes  audio track ID
-
-*/
-
 typedef struct BINKIOHEADER {
     u32 Magic;
     u32 Size;           // File size, excluding the first 8 bytes
@@ -84,6 +40,34 @@ typedef struct BINKIOHEADER {
     u32 Tracks;         // Number of audio tracks
 } BINKIOHEADER, * BINKIOHEADERPTR;
 
+typedef struct BINKIODATA
+{
+    HANDLE          Handle;             // 0x0
+    s32             HeaderOffset;       // 0x4 // TODO Name
+    s32             DataOffset;         // 0x8 // TODO Name
+    void*           Buffer;             // 0xC // TODO Name
+    s32             BufferSize;         // 0x10 // TODO Name
+    volatile s32    ReadCount;          // 0x14
+    volatile s32    Unk0x18;            // 0x18 // TODO Some sort of lock
+    void*           Unk0x1C;            // 0x1C // TODO Buffer
+    void*           Unk0x20;            // 0x20 // TODO Buffer
+    void*           Unk0x24;            // 0x24 // TODO Buffer
+    u32             IsExternal;         // 0x28
+    u32             FilePointer;        // 0x2c
+    s32             FileSize;           // 0x30
+
+    // This value is set in bytes per second,
+    // use 150,000 for a 1xCD, 300,000 for a 2xCD, and 600,000 for a 4xCD. 
+    u32             SimulateRate;       // 0x34
+    u32             SimulateDelay;      // 0x38
+    s32             Unk0x3C;            // 0x3C // TODO
+} BINKIODATA, * BINKIODATAPTR;
+
+#define ASIODATA(X) ((BINKIODATAPTR)(X->iodata))
+
+extern u32          IOSize;     // 0x1003a074
+extern BINKIOOPEN   IO;         // 0x10041b94
+
 s32 RADLINK BinkOpenFile(struct BINKIO PTR4* io, const char PTR4* name, u32 flags);
 u32 RADLINK BinkGetFileBufferSize(struct BINKIO PTR4* io, u32 size);
 u32 RADLINK BinkReadFile(struct BINKIO PTR4* io);
@@ -93,6 +77,3 @@ void RADLINK BinkCloseFile(struct BINKIO PTR4* io);
 void RADLINK BinkSetFileInfo(struct BINKIO PTR4* io, void PTR4* buf, u32 size, u32 fileSize, u32 simulate);
 
 void BinkReadFileSimulate(struct BINKIO PTR4* io, u32 size, u32 time);
-
-extern u32          IOSize;     // 0x1003a074
-extern BINKIOOPEN   IO;         // 0x10041b94

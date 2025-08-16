@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <Yoink.hxx>
 
+#include <IO.hxx>
 #include <Mem.hxx> // TODO Temp
 
 #include <stdio.h>
@@ -38,31 +39,6 @@ typedef void(RADEXPLINK *BINKCLOSEACTION)(HBINK bnk);
 
 #define BINK_MEM_SIZES_ADDRESS(X)   ((size_t)X + (0x1004167c - BINK_BASE_ADDRESS))
 #define BINK_MEM_ITEMS_ADDRESS(X)   ((size_t)X + (0x1004187c - BINK_BASE_ADDRESS))
-
-typedef struct BINKIODATA
-{
-    HANDLE          Handle;             // 0x0
-    s32             HeaderOffset;       // 0x4 // TODO Name
-    s32             DataOffset;         // 0x8 // TODO Name
-    void*           Buffer;             // 0xC // TODO Name
-    s32             BufferSize;         // 0x10 // TODO Name
-    volatile s32    ReadCount;          // 0x14
-    volatile s32    Unk0x18;            // 0x18 // TODO Some sort of lock
-    void*           Unk0x1C;            // 0x1C // TODO Buffer
-    void*           Unk0x20;            // 0x20 // TODO Buffer
-    void*           Unk0x24;            // 0x24 // TODO Buffer
-    u32             IsExternal;         // 0x28
-    u32             FilePointer;        // 0x2c
-    s32             FileSize;           // 0x30
-
-    // This value is set in bytes per second,
-    // use 150,000 for a 1xCD, 300,000 for a 2xCD, and 600,000 for a 4xCD. 
-    u32             SimulateRate;       // 0x34
-    u32             SimulateDelay;      // 0x38
-    s32             Unk0x3C;            // 0x3C // TODO
-} BINKIODATA, * BINKIODATAPTR;
-
-#define ASIODATA(X) ((BINKIODATAPTR)(X->iodata))
 
 static u32 CompareBink(HBINK a, HBINK b)
 {

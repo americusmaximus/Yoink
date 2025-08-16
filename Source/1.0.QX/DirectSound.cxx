@@ -33,28 +33,6 @@ SOFTWARE.
 // to a range of values of 0 to 127 that can be used to pick the resulting value from the map table.
 #define NORMALIZE_PAN(x)                    ((x * 127 + (PAN_CENTER + 1)) >> 16)
 
-typedef struct BINKDIRECTSOUNDDATA
-{
-    LPDIRECTSOUNDBUFFER Buffer;                             // 0x0
-    u32                 Length;                             // 0x4
-    u32                 Unk0x8;                             // 0x8 // TODO
-    u32                 ChunkSize;                          // 0xC
-    u32                 Frequency;                          // 0x10
-    u32                 Bits;                               // 0x14
-    u32                 Channels;                           // 0x18
-    u32                 Volume;                             // 0x1C
-    u32                 Pan;                                // 0x20
-    u32                 Unk0x24;                            // 0x24 // TODO
-    u32                 Unk0x28;                            // 0x28 // TODO
-    s32                 ChunkIndex1;                        // 0x2C // TODO
-    s32                 ChunkIndex2;                        // 0x30 // TODO
-    u32                 IsStopped;                          // 0x34
-    u32                 Lock1Length;                        // 0x38
-    u8*                 Lock1Data;                          // 0x3C
-    u32                 Lock2Length;                        // 0x40
-    u8*                 Lock2Data;                          // 0x44
-} BINKDIRECTSOUNDDATA, * HBINKDIRECTSOUNDDATA;
-
 #define ASSOUNDDATA(X) ((HBINKDIRECTSOUNDDATA)(X->snddata))
 
 LPDIRECTSOUND           DirectSound = DEFAULT_DIRECT_SOUND_INSTANCE;

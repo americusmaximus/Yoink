@@ -33,8 +33,6 @@ SOFTWARE.
 #define PAN_CENTER      32767
 #define PAN_RIGHT       65537
 
-// TODO check all +1, +2, -1 values of volume and pan
-
 #define DEFAULT_SOUND_CHUNK_INDEX               (-1)
 
 #define SOUND_TRACK_TYPE_FREQUENCY(X)           (X & 0xFFFF)
@@ -56,9 +54,10 @@ typedef struct BINKSNDCOMP
     // TODO
 } BINKSNDCOMP, * HBINKSNDCOMP;
 
-u32 BinkSoundFrameClear(HBINK bnk);
 void RADEXPLINK BinkSoundCompressorRelease(void* comp);
 void RADEXPLINK BinkSoundFrameFill(HBINK bink);
+
+u32 BinkSoundFrameClear(HBINK bnk);
 u8* BinkSoundConvertTo8Bits(u8* dst, u16* src, size_t size);
 
 HBINKSNDCOMP BinkSoundCompressionInitialize(u32 freq, u32 chans, u32 type);

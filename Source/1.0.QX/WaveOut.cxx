@@ -24,22 +24,6 @@ SOFTWARE.
 
 #define MAX_WAVE_OUT_ITEM_COUNT     16
 
-typedef struct BINKWAVEOUTDATA
-{
-    u32         Volume;         // 0x0
-    u32         Pan;            // 0x4
-    s32         Unk0x8;         // 0x8 // TODO
-    u32         IsPaused;       // 0xC
-    s32         LockChunk;      // 0x10
-    s32         WriteChunk;     // 0x14
-    u32         WriteLength;    // 0x18
-    s32         Unk0x1C;        // 0x1C // TODO
-    u32         Length;         // 0x20
-    HWAVEOUT    WaveOut;        // 0x24
-    LPWAVEHDR*  Headers;        // 0x28
-    void*       Mem;            // 0x2C
-} BINKWAVEOUTDATA, * HBINKWAVEOUTDATA;
-
 #define ASSOUNDDATA(X) ((HBINKWAVEOUTDATA)(X->snddata))
 
 s32 RADLINK BinkWaveOutOnOff(struct BINKSND PTR4* snd, s32 status);
